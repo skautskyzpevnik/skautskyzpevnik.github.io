@@ -1,0 +1,26 @@
+.key{
+    display: inline;
+}
+.settingsrow{
+    margin: 1rem;
+}
+.setButton{
+    margin: 0;
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    height: 1.5rem;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    border-radius: 0.5rem;
+    margin-left: 0.5rem;
+}
+
+input{
+    background-color: #435e44;
+    border: #394439;
+}

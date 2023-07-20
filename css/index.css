@@ -1,0 +1,13 @@
+#content{
+    display: flex;
+    flex-direction: column;
+}
+.gratio_filler_top{
+    flex-grow: 6;
+    flex-shrink: 6;
+}
+
+.gratio_filler_bot{
+    flex-grow: 9.7;
+    flex-shrink: 9.7;
+}

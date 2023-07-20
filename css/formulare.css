@@ -1,0 +1,10 @@
+div.gallery {
+  display: inline-block;
+}
+
+div.gallery:hover {
+  border: 0px solid #777;
+}
+.responsive{
+  min-width: 300px;
+}

@@ -1,0 +1,14 @@
+img{
+  border-radius: 50%;  
+}
+ul{
+  padding: 0;
+}
+.personDescription{
+  display: inline-block;
+  position: relative;
+  left: 1rem;
+}
+.person{
+  display: block;
+}

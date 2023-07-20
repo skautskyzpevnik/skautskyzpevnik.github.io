@@ -1,0 +1,199 @@
+body{
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-family: Verdana;
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}   
+
+.mainh{
+    margin-top: 2rem;
+}
+
+.button {
+    background-color: #4CAF50; /* Green */
+    
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+nav {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    display: inline-flex;
+    list-style: none;
+}
+
+nav .filler, footer .filler{
+    flex-grow: 1;
+}
+
+a:link, a:visited{
+    text-decoration: none
+}   
+nav li {
+    background-color:black;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    opacity: .8;
+    text-align: center;
+    font-size: 20px;
+    /*position: absolute;*/
+}
+
+nav li a {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    text-decoration: none;
+    color: white;
+    display: block;
+} 
+    
+nav li a:hover {
+    background-color: #353535;
+}
+            
+nav li ul{
+    display: none;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    z-index: 100;
+}
+ 
+nav li > ul > li{
+    overflow: hidden;
+}
+        
+nav li:hover ul {
+    display: block;
+    position: absolute;
+}
+
+nav .logo img{
+    width: 5rem;
+}
+
+div.div1{
+    position:   absolute      ;
+    background-color:  black      ;
+    opacity:     0.8  ;
+    border-radius: 8px;
+    display: inline-block;
+    float: center;
+    left: 450;
+    width: 400;
+    text-align: center;
+    height: 80;
+
+}
+div.div2{
+    position: absolute;
+    background-color: black;
+    opacity: 0.8;
+    border-radius: 8px;
+    display: inline-block;
+    float: center;
+    left: 230;
+    width: 850;
+    text-align: center;
+}
+
+nav .button {
+    background-color: black; /* Green */
+    
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    overflow: hidden;
+    display: inline-block;
+    font-size: 16px;
+    float: center;
+    position: absolute; 
+    right: 540;
+    margin: 4px 2px;
+    cursor: pointer;
+    opacity: 0.8;
+    border-radius: 8px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+/* .button3 {
+    position: absolute; 
+    right: 380;
+    overflow: visible;
+}
+.button2 {
+    position: absolute; 
+    right: 540;
+    overflow: visible;
+} */
+
+footer{
+    display: inline-flex;
+    width: 100%;
+    align-self: flex-end;
+}
+
+footer .skautlogo, footer .copyright{
+    flex-grow: 0;
+}
+
+footer .copyright p{
+    margin: 0;
+    align-self: flex-end;
+}
+
+footer .copyright div{
+    display: flex;
+    height: 100%;
+}
+
+#content{
+    flex-grow: 1;
+    margin: 1em;
+}
+
+@media (max-aspect-ratio: 8/5) {
+    body {
+      flex-direction: column-reverse;
+    }
+    
+    footer .copyright p{
+        margin: 0;
+        align-self: flex-start;
+    }
+
+    nav .filler, nav .logo{
+        display: none;
+    }
+
+    nav li{
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+
+    nav{
+        justify-content: stretch;
+    }
+}
