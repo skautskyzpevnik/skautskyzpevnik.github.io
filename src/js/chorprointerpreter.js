@@ -179,9 +179,22 @@ function parseChordPro(template) {
 							paragraph = document.createElement("p");
 
 							let x_chtspan = document.createElement("span");
-							span.setAttribute("class", "chorus");
-							span.innerText = last_chorus + text
-							paragraph.appendChild(span);
+							x_chtspan.setAttribute("class", "chorus");
+							x_chtspan.innerText = last_chorus + text
+							paragraph.appendChild(x_chtspan);
+
+							buffer.push(paragraph);
+							paragraph = document.createElement("p");
+
+							break;
+						case "chorus":
+							buffer.push(paragraph);
+							paragraph = document.createElement("p");
+
+							let chtspan = document.createElement("span");
+							chtspan.setAttribute("class", "chorus");
+							chtspan.innerText = last_chorus
+							paragraph.appendChild(chtspan);
 
 							buffer.push(paragraph);
 							paragraph = document.createElement("p");

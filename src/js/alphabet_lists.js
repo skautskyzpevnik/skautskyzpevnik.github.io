@@ -8,7 +8,9 @@ async function render(){
 
     let list = await fetch("data/"+ char +".json");
     list = await list.json();
-    for(song in list){
+    const sortedKeys = Object.keys(list).sort();
+    for(song in sortedKeys){
+        song = sortedKeys[song]
         let button = document.createElement("button");
         button.setAttribute("class", "button");
         button.setAttribute("data-link", list[song].file);

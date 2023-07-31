@@ -7,7 +7,7 @@ if(songName != undefined){
 
 async function getSongByname(songName){
 	try{
-		let chordPro = await fetch("data/songs/"+songName+".chordpro");
+		let chordPro = await fetch("data/"+songName+".chordpro");
 		chordPro = await chordPro.text();
 		let parsed = parseChordPro(chordPro);
 		parsed.html.forEach(element => {
