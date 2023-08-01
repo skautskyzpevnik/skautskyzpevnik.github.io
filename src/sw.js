@@ -43,8 +43,16 @@ async function removeFromCache(cache, toremove){
  * @param {Array} toinsert array of things to insert
  */
 async function insertToCache(cache, toinsert){
+    const baseUrl = new URL(location.href);
+    const pathParts = baseUrl.pathname.split('/');
+  
+    // Remove the last part (filename) from the pathname
+    pathParts.pop();
+  
+    // Join the parts back together to form the updated URL
+    baseUrl.pathname = pathParts.join('/');
     for(let x in toinsert){
-        await cache.add(toinsert[x].url);
+        await cache.add(baseUrl + "/" + toinsert[x]);
     }
 }
 
@@ -72,9 +80,7 @@ async function cleanCache(cache){
  */
 async function redownloadfull(clientjson, cache){
     await cleanCache(cache);
-    for(let x in clientjson.resources){
-        await cache.add(clientjson.resources[x]);
-    }
+        await insertToCache(cache, clientjson.resources);
 }
 
 async function updateCache(){

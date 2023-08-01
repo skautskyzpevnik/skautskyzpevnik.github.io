@@ -1,7 +1,7 @@
 {
     "version": 0.1,
     "resources":[
-        "/",
+        "",
         "index.html",
         "render.html",
         "seznamy.html",
