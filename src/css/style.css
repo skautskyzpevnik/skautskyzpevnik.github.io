@@ -1,3 +1,7 @@
+.mobile_only{
+    display: none;
+}
+
 body{
     background-repeat: no-repeat;
     background-size: cover;
@@ -182,12 +186,23 @@ footer .copyright div{
       flex-direction: column-reverse;
     }
     
+    #nav li:hover ul {
+        display: none;
+    }
+
+    #nav .mobile_only:hover ul {
+        display: block;
+        bottom: 3em;
+        right: 0px;
+        position: absolute;
+    }
+    
     footer .copyright p{
         margin: 0;
         align-self: flex-start;
     }
 
-    #nav .filler, #nav .logo{
+    #nav .filler, .desktop_only{
         display: none;
     }
 
@@ -197,7 +212,15 @@ footer .copyright div{
     }
 
     #nav{
+        top: auto;
         justify-content: stretch;
+    }
+    nav{
+        position: sticky;
+        bottom: 0px;
+    }
+    .mobile_only{
+        display: block;
     }
 }
 
