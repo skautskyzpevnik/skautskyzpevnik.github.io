@@ -105,7 +105,8 @@ async function updateCache(){
                 // console.log("Cache is already downloaded and up to date");
             }
         }
-    cache.put(req, versions);
+        new Request(swSettings.cacheFile);
+        cache.put(req, versions);
     } catch (error) {
         // console.error(e)
     }
