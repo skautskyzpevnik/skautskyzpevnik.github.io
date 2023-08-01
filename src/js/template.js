@@ -85,6 +85,7 @@ function getPrefix(){
 //include all required scripts
 include(["js/bg.js", "js/settings.js"]);
 add_css(["css/style.css"]);
+add_manifest("manifest.webmanifest");
 
 /**
  * function to create script element
@@ -113,8 +114,16 @@ function include(scripts){
  */
 function add_css(css){
   css.forEach(element => {
-    document.head.appendChild(create_csstag(prefix + element));
+    document.head.appendChild(create_linktag(prefix + element, "stylesheet"));
   });
+}
+
+/**
+ *  function to add manifest to all pages
+ * @param {Array} css array of css to include
+ */
+function add_manifest(manifest){
+  document.head.appendChild(create_linktag(prefix + manifest, "manifest"));
 }
 
 /**
@@ -168,9 +177,9 @@ async function build_foo(){
  * @param {string} url 
  * @returns {HTMLLinkElement}
  */
-function create_csstag(url){
+function create_linktag(url, rel){
   const link = document.createElement("link");
-  link.setAttribute("rel", "stylesheet");
+  link.setAttribute("rel", rel);
   link.setAttribute("href", url);
   return link;
 }
