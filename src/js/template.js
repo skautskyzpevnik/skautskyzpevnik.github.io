@@ -211,7 +211,7 @@ function resolveRelativeUrl(baseUrl, relativeUrl) {
 // lets install service worker
 async function registerServiceWorker() {
   if('serviceWorker' in navigator) {
-    const url = resolveRelativeUrl(location.href, "../sw.js");
+    const url = resolveRelativeUrl(location.href, "sw.js");
     const registration = await navigator.serviceWorker.register(url);
     if (registration.installing) {
       console.log("Service worker installing");
