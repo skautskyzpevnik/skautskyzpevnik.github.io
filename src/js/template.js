@@ -176,11 +176,21 @@ function create_csstag(url){
 }
 
 // lets install service worker
-// if('serviceWorker' in navigator) {
-//   navigator.serviceWorker
-//        .register('sw.js')
-//        .then(function() { console.log('Service Worker Registered'); });
-// }
+async function registerServiceWorker() {
+  if('serviceWorker' in navigator) {
+    const registration = await navigator.serviceWorker.register('../sw.js', {"scope":"/"});
+    if (registration.installing) {
+      console.log("Service worker installing");
+    } else if (registration.waiting) {
+      console.log("Service worker installed");
+    } else if (registration.active) {
+      console.log("Service worker active");
+    }
+  }else{
+    console.error("Service Worker API unavailable");
+  }
+}
 
 build_nav();
 build_foo();
+registerServiceWorker();
