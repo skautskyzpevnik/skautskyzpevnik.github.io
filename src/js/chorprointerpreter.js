@@ -225,6 +225,7 @@ function parseChordPro(template) {
 			/* Anything else */
 
 			span = document.createElement("span");
+			span.setAttribute("class", "lyrics")
 			span.innerText = line;
 			linewrapper.appendChild(span);
 			br = document.createElement("br");
