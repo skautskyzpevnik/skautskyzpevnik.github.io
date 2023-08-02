@@ -1,0 +1,7 @@
+disallow: js/
+disallow: css/
+disallow: akordy/
+disallow: data/
+disallow: img/
+disallow: include/
+disallow: settings/
