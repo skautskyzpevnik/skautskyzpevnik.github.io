@@ -1,0 +1,5 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target" : { "namespace": "android_app", "package_name": "io.github.skautskyzpevnik.twa",
+                 "sha256_cert_fingerprints": ["A4:3C:DE:F7:A2:B3:A8:67:0F:3D:C7:65:53:4A:C0:CE:25:A3:4B:89:2C:57:78:0A:D0:E1:6B:FC:E2:B1:F2:A8"] }
+  }]

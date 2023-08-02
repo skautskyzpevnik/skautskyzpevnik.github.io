@@ -1,0 +1,43 @@
+{
+  "packageId": "io.github.skautskyzpevnik.twa",
+  "host": "skautskyzpevnik.github.io",
+  "name": "Skautský zpěvník",
+  "launcherName": "Zpěvník",
+  "display": "fullscreen",
+  "themeColor": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#FFFF00",
+  "enableNotifications": true,
+  "startUrl": "/index.html",
+  "iconUrl": "https://skautskyzpevnik.github.io/img/favicon.svg",
+  "maskableIconUrl": "https://skautskyzpevnik.github.io/img/favicon_mask.svg",
+  "monochromeIconUrl": "https://skautskyzpevnik.github.io/img/favicon_mono.svg",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "/home/viotal/dev/android/bw/chordPro/android.keystore",
+    "alias": "skautskyzpevnik"
+  },
+  "appVersionName": "4",
+  "appVersionCode": 4,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://skautskyzpevnik.github.io/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://skautskyzpevnik.github.io/",
+  "minSdkVersion": 19,
+  "orientation": "portrait-primary",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "appVersion": "4"
+}
