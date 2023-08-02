@@ -86,6 +86,7 @@ function getPrefix(){
 include(["js/bg.js", "js/settings.js"]);
 add_css(["css/style.css"]);
 add_manifest("manifest.webmanifest");
+add_favicon("favicon.ico");
 
 /**
  * function to create script element
@@ -120,10 +121,18 @@ function add_css(css){
 
 /**
  *  function to add manifest to all pages
- * @param {Array} css array of css to include
+ * @param {string} manifest relative url of manifest to include
  */
 function add_manifest(manifest){
   document.head.appendChild(create_linktag(prefix + manifest, "manifest"));
+}
+
+/**
+ *  function to add favicon to all pages
+ * @param {string} favicon relative url of favicon to include
+ */
+function add_favicon(favicon){
+  document.head.appendChild(create_linktag(prefix + favicon, "shortcut icon"));
 }
 
 /**
