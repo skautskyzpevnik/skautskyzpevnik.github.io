@@ -193,34 +193,11 @@ function create_linktag(url, rel){
   return link;
 }
 
-function resolveRelativeUrl(baseUrl, relativeUrl) {
-  const urlParts = baseUrl.split('/');
-  const relativeParts = relativeUrl.split('/');
-
-  // Remove the last part of the base URL if it's not a filename
-  if (!baseUrl.endsWith('/')) {
-    urlParts.pop();
-  }
-
-  // Process the relative URL parts
-  for (const part of relativeParts) {
-    if (part === '..') {
-      urlParts.pop();
-    } else if (part !== '.') {
-      urlParts.push(part);
-    }
-  }
-
-  // Join the parts to create the resolved URL
-  const resolvedUrl = urlParts.join('/');
-  return resolvedUrl;
-}
-
 
 // lets install service worker
 async function registerServiceWorker() {
   if('serviceWorker' in navigator) {
-    const url = resolveRelativeUrl(location.href, "sw.js");
+    const url = "sw.js";
     const registration = await navigator.serviceWorker.register(url);
     if (registration.installing) {
       console.log("Service worker installing");

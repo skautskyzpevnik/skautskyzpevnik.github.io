@@ -43,24 +43,13 @@ async function removeFromCache(cache, toremove){
  * @param {Array} toinsert array of things to insert
  */
 async function insertToCache(cache, toinsert){
-    const pathParts = location.href.split('/');
-  
-    // Remove the last part (filename) from the pathname
-    pathParts.pop();
-  
-    if(pathParts[pathParts.length-1] == ""){
-        pathParts.pop();
-        pathParts.pop();
-    }
-    
-    const final_url = pathParts.join("/")
 
     // Join the parts back together to form the updated URL
     for(let x in toinsert){
         try{
-            await cache.add(final_url + "/" + toinsert[x]);
+            await cache.add(toinsert[x]);
         }catch{
-            console.error("Unable to add file to cache. File: " + final_url + "/" + toinsert[x])
+            console.error("Unable to add file to cache. File: " + toinsert[x])
         }
     }
 }
