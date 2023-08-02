@@ -193,6 +193,8 @@ function resolveRelativeUrl(baseUrl, relativeUrl) {
     urlParts.pop();
   }
 
+  urlParts.pop();
+
   // Process the relative URL parts
   for (const part of relativeParts) {
     if (part === '..') {

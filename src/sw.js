@@ -43,16 +43,25 @@ async function removeFromCache(cache, toremove){
  * @param {Array} toinsert array of things to insert
  */
 async function insertToCache(cache, toinsert){
-    const baseUrl = new URL(location.href);
-    const pathParts = baseUrl.pathname.split('/');
+    const pathParts = location.href.split('/');
   
     // Remove the last part (filename) from the pathname
     pathParts.pop();
   
+    if(pathParts[pathParts.length-1] == ""){
+        pathParts.pop();
+        pathParts.pop();
+    }
+    
+    const final_url = pathParts.join("/")
+
     // Join the parts back together to form the updated URL
-    baseUrl.pathname = pathParts.join('/');
     for(let x in toinsert){
-        await cache.add(baseUrl + "/" + toinsert[x]);
+        try{
+            await cache.add(final_url + "/" + toinsert[x]);
+        }catch{
+            console.error("Unable to add file to cache. File: " + final_url + "/" + toinsert[x])
+        }
     }
 }
 
@@ -108,7 +117,7 @@ async function updateCache(){
         new Request(swSettings.cacheFile);
         cache.put(req, versions);
     } catch (error) {
-        // console.error(e)
+        console.error(error);
     }
 }
 
