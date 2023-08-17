@@ -18,7 +18,8 @@
 
 /* Parse a ChordPro template */
 function parseChordPro(template) {
-	let chordregex= /\[([^\]]*)\]/;
+	const chordwordregex = /([^\s]*\[[^\]]*\][^\s]*)/;
+	const chordregex = /\[([^\]]*)\]/;
 	let buffer    = [];
 	let title = "";
 	let artist = "";
@@ -60,56 +61,40 @@ function parseChordPro(template) {
 			return "";
 		}else if (line.match(chordregex)) {
 		/* Chord line */
-
-			chordsSplit = line.split(chordregex);
-			let i = 0
-			while (i < chordsSplit.length) {
-				let chordLyricsWrapper = document.createElement("div");
-				chordLyricsWrapper.setAttribute("class", "chordLyricsWrapper");
-
-				let lyrics = document.createElement("span");
-				lyrics.setAttribute("class", "lyrics");
-				
-				let chord = document.createElement("span");
-				chord.setAttribute("class", "chord");
-				
-				let word = chordsSplit[i];
-
-				if ((i % 2) == 1) {
-					/* Chords */
-					chord.innerText = word;
-					
-					if((i + 1) < chordsSplit.length){
-						if(chordsSplit[i+1] == ""){
-							lyrics.innerHTML = "&nbsp;";
-						}else{
-							lyrics.innerText = chordsSplit[i+1];
+			const wordSplit = line.split(" ");
+			let i = 0;
+			while(i < wordSplit.length){
+				let word = wordSplit[i];
+				const wordWrapper = document.createElement("div");
+				wordWrapper.setAttribute("class", "wordWrapper");
+				if(word.match(chordregex)){
+					const wordchordsplit = word.split(chordregex);
+					let j = 0;
+					while(j < wordchordsplit.length){
+						let match = wordchordsplit[j];
+						if(match != ""){						
+							if(j%2){
+								if(wordchordsplit[j] < wordchordsplit[j+1] & !wordSplit[i+1].match(chordregex)){
+									// chord longer than lyrics and we can use next word
+									wordWrapper.appendChild(createChordLyricsWrapper(wordchordsplit[j+1] + " " + wordSplit[i+1], match));
+								}else{
+									wordWrapper.appendChild(createChordLyricsWrapper(wordchordsplit[j+1], match));
+								}
+								
+								j++;
+							}else{
+								wordWrapper.appendChild(createChordLyricsWrapper(match, ""));
+							}
 						}
-						i += 2;
-					}else{
-						lyrics.innerHTML = "&nbsp;";
-						i++;
+						j++;
 					}
-				} else {
-					/* Lyrics */
-					if(word != ""){
-						lyrics.innerText = word;
-					}
-					i++;
+				}else{
+					wordWrapper.appendChild(createChordLyricsWrapper(word, ""));
 				}
-				if(chord.innerText != "" || lyrics.innerText != ""){
-					
-					if(lyrics.innerText.charAt(0) == " "){
-						lyrics.innerHTML = "&nbsp;" + lyrics.innerHTML;
-					}
-					if(lyrics.innerText.charAt(lyrics.innerText.length - 1) == " "){
-						lyrics.innerHTML += "&nbsp;";
-					}
-
-					chordLyricsWrapper.appendChild(chord);
-					chordLyricsWrapper.appendChild(lyrics);
-					linewrapper.appendChild(chordLyricsWrapper);
-				}
+				linewrapper.appendChild(wordWrapper);
+				wordWrapper.appendChild(createChordLyricsWrapper(" ", ""));
+				linewrapper.appendChild(wordWrapper);
+				i++;
 			}
 			paragraph.appendChild(linewrapper);
 		}else if (line.match(/^{.*}/)) {
@@ -217,10 +202,7 @@ function parseChordPro(template) {
 			paragraph = document.createElement("p");
 			
 			add_verse = true
-
-			// let verseWrapper = document.createElement("div");
-			// verseWrapper.setAttribute("class", "start_of_verseWrapper");
-			// verseWrapper.appendChild(span)
+			
 		}else{
 			/* Anything else */
 
@@ -243,4 +225,32 @@ function parseChordPro(template) {
 		"artist": artist,
 		"html": buffer
 	};
+}
+
+function createChordLyricsWrapper(lyrics, chord) {
+	const chordLyricsWrapper = document.createElement("div");
+	chordLyricsWrapper.setAttribute("class", "chordLyricsWrapper");
+
+	const lyricsHolder = document.createElement("span");
+	lyricsHolder.setAttribute("class", "lyrics");
+
+	const chordHolder = document.createElement("span");
+	chordHolder.setAttribute("class", "chord");
+
+	if(chord == ""){
+		chordHolder.innerHTML = "&nbsp";
+	}else{
+		chordHolder.innerText = chord;
+	}
+
+	chordLyricsWrapper.appendChild(chordHolder);
+
+	if(lyrics == ""){
+		lyricsHolder.innerHTML = "&nbsp";
+	}else{
+		lyricsHolder.innerText = lyrics;
+	}
+	chordLyricsWrapper.appendChild(lyricsHolder);
+
+	return chordLyricsWrapper;
 }

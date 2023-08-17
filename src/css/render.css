@@ -2,14 +2,6 @@
     margin: 0;
 }
 
-.linewrapper{
-    white-space: nowrap;
-}
-
-.lyrics{
-    white-space: normal;
-}
-
 body{
     background-image: url("../img/render.png");
     background-repeat: repeat-y;
@@ -78,12 +70,12 @@ p{
     }
 }
 
-.move_left{
+.start_of_verse{
     position: relative;
     text-indent: -1em;
 }
 
-.move_left .chord{
-    position: relative;
-    text-indent: 0em;
+.wordWrapper{
+    display: inline-block;
+    white-space: nowrap;
 }
