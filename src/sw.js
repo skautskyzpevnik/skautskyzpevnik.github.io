@@ -120,7 +120,7 @@ async function updateCache(){
     } catch (error) {
         console.error(error);
     }
-    //await updateSongs();
+    await updateSongs();
 }
 
 self.addEventListener("install", event => {
