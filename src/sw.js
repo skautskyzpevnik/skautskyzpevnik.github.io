@@ -88,7 +88,11 @@ async function updateSongs(){
     await cleanCache(songCache);
     for(song in list){
         song = list[song];
-        await songCache.add("data/" + song.file + ".chordpro");
+        try {
+            await songCache.add("data/" + song.file + ".chordpro");
+        } catch (error) {
+            
+        }
     }
     songCache.add("data/list.json");
 }
