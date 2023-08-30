@@ -116,7 +116,7 @@ async function updateCache(){
             }
         }
         req = new Request(swSettings.cacheFile);
-        cache.put(req, versions);
+        cache.put(req, res);
     } catch (error) {
         console.error(error);
     }
