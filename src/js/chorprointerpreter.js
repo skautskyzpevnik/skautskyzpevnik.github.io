@@ -16,241 +16,432 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* Parse a ChordPro template */
-function parseChordPro(template) {
-	const chordwordregex = /([^\s]*\[[^\]]*\][^\s]*)/;
-	const chordregex = /\[([^\]]*)\]/;
-	let buffer    = [];
-	let title = "";
-	let artist = "";
+class ChordProNode{
+	previousNode = undefined;
+	nextNode = undefined;
+	#parentNode = undefined;
 
-	if (!template) return "";
-
-	let paragraph = document.createElement("p")
-	let verse_num = 1;
-	let verse_label = ""
-	let add_verse = false;
-	let last_chorus = ""
-
-	const lineArray = template.split("\n");
-
-	lineArray.forEach(function(line, linenum) {
-		let linewrapper = document.createElement("div");
-		linewrapper.setAttribute("class", "linewrapper");
-
-		if(add_verse){
-			let span = document.createElement("span");
-			span.setAttribute("class", "start_of_verse");
-
-			if(verse_label != ""){
-				span.innerText = verse_label;
-				verse_label = "";
-			}else{
-				span.innerText = verse_num + "." ;
-				verse_num++;
-			}
-			span.innerHTML += "&nbsp;";
-			linewrapper.appendChild(span);
-			linewrapper.setAttribute("class", linewrapper.getAttribute("class") + " move_left");
-			add_verse = false;
+	get parentNode(){
+		if(this.type === "song-root"){
+			return this;
+		}else{
+			return this.#parentNode;
 		}
+	}
 
+	set parentNode(value){
+		if(this.type === "song-root"){
+			console.error("You cannot set parentNode of song-root.")
+		}else{
+			this.#parentNode = value;
+		}
+	}
 
+	remove(){
+		if(this.type !== "song-root"){
+			let previousNode = this.previousNode;
+			let nextNode = this.nextNode;
+			if(this.previousNode !== undefined & this.nextNode !== undefined){
+				//middle
+				this.previousNode.nextNode = nextNode;
+				this.nextNode.previousNode = previousNode;
+			}else if(this.previousNode === undefined & this.previousNode !== undefined){
+				//first
+				this.parentNode.removeFirstChild();
+			}else{
+				//last
+				this.parentNode.removeLastChild();
+			}
+		}else{
+			console.error("Tried to remove song-root node.");
+		}
+	}
+}
+
+class ChordProTextNode extends ChordProNode{
+	BlankLineNewVerse = false;
+	constructor(innerText, type){
+		super();
+		this.innerText = innerText;
+		this.type = type;
+	}
+}
+
+class ChordProChorusLink extends ChordProNode{
+	type = "choruslink"
+	constructor(chorus, times){
+		super();
+		this.chorus = chorus;
+		this.times = times;
+	}
+}
+
+class ChordProCollectionNode extends ChordProNode{
+	BlankLineNewVerse = true;
+	#firstChild = undefined;
+	#lastChild = undefined;
+	constructor(type=""){
+		super();
+		this.type = type;
+	}
+	appendChild(node){
+		if(node !== undefined){
+			node.parentNode = this;
+			if(this.#firstChild === undefined){
+				this.#firstChild = node;
+				this.#lastChild = node;
+			}else if(this.#lastChild !== undefined){
+				node.previousNode =  this.#lastChild;
+				this.#lastChild.nextNode = node;	
+			}else{
+				console.error("There ahould always be lastChild if there is firstchild");
+			}
+			this.#lastChild = node;
+		}
+	}
+	
+	removeLastChild(){
+		if(this.#lastChild.previousNode !== undefined){
+			this.#lastChild.previousNode.nextNode = undefined;
+		}else{
+			this.#firstChild = undefined;
+		}
+		this.#lastChild = this.#lastChild.previousNode;
+	}
+
+	removeFirstChild(){
+		if(this.#firstChild.nextNode !== undefined){
+			this.#firstChild.nextNode.previousNode = undefined;
+		}else{
+			this.#lastChild = undefined;
+		}
+		this.#firstChild = this.#firstChild.previousNode;
+	}
+
+	get firstChild(){
+		return this.#firstChild;
+	}
+	get lastChild(){
+		return this.#lastChild;
+	}
+
+	get innerText(){
+		let result = "";
+		this.forEach(function(active_child) {
+			result += active_child.innerText;
+		})
+		return result;
+	}
+
+	get array(){
+		let tmp = [];
+		this.forEach(function(element){
+			tmp.push(element);
+		});
+		return tmp;
+	}
+
+	forEach(callback){
+		let i = 0;
+		let active_child = this.firstChild;
+		while(active_child !== undefined){
+			callback(active_child, i);
+			i++;
+			active_child = active_child.nextNode;
+		}
+	}
+}
+
+class ChordProSong extends ChordProCollectionNode{
+	title="";
+	artist="";
+	constructor(){
+		super("song-root")
+	}
+}
+
+class ChordProLine extends ChordProCollectionNode{
+	constructor(){
+		super("line");
+	}
+	get innerText(){
+		let result = "";
+		this.forEach(function(active_child) {
+			result += active_child.innerText;
+		})
+		return result + "\n";
+	}
+}
+
+class ChordProVerse extends ChordProCollectionNode{
+	constructor(name=undefined){
+		super("verse");
+		this.name = name;
+	}
+	get innerText(){
+		let result = "";
+		this.forEach(function(active_child) {
+			result += active_child.innerText;
+		})
+		return result + "\n";
+	}
+}
+
+class ChordProChorus extends ChordProCollectionNode{
+	BlankLineNewVerse = false;
+	constructor(name=""){
+		super("chorus");
+		this.name = name;
+	}
+	get innerText(){
+		let result = "";
+		this.forEach(function(active_child) {
+			result += active_child.innerText;
+		})
+		return result + "\n";
+	}
+}
+
+class ChordProWord extends ChordProCollectionNode{
+	hasChord = false;
+	constructor(){
+		super("word");
+	}
+	appendChord(node){
+		this.hasChord = true;
+		this.appendChild(node);
+	}
+	get innerText(){
+		let result = "";
+		this.forEach(function(active_child) {
+			result += active_child.innerText;
+		})
+		return result + " ";
+	}
+}
+
+class ChordProChord extends ChordProTextNode{
+	constructor(innerText){
+		super(innerText, "chord");
+	}
+}
+
+class ChordProText extends ChordProTextNode{
+	constructor(innerText){
+		super(innerText, "text");
+	}
+}
+
+/* Parse a ChordPro template */
+function parseChordPro(template){
+
+	const chordregex = /\[([^\]]*)\]/;
+	if(!template){
+		throw Error("Please provide nonemptystring template.")
+	}
+	
+	/**
+	 * 
+	 * @param {string} line 
+	 * @param {ChordProLine} lineNode 
+	 * @returns {ChordProLine}
+	 */
+	function parseLine(line, lineNode){
+		line.split(" ").forEach(function(rawWord){
+			let word = new ChordProWord();
+			if(rawWord.match(chordregex)){
+				rawWord.split(chordregex).forEach(function(wordPart, partNumber){
+					if(partNumber%2){
+						let chord = new ChordProChord(wordPart);
+						word.appendChord(chord); 
+					}else{
+						let textNode = new ChordProText(wordPart);
+						word.appendChild(textNode); 
+					}
+				});		
+			}else{
+				let textNode = new ChordProText(rawWord);
+				word.appendChild(textNode); 	
+			}
+			lineNode.appendChild(word);
+		});
+		return lineNode;
+	} 
+
+	
+	let rootNode = new ChordProSong();
+	let curentNode = rootNode;
+	let lastAction = undefined;
+	template.split("\n").forEach(function(line, linenum) {
+		
 		/* Comment, ignore */
 		if (line.match(/^#/)) {
 			return "";
-		}else if (line.match(chordregex)) {
-		/* Chord line */
-			const wordSplit = line.split(" ");
-			let i = 0;
-			while(i < wordSplit.length){
-				let word = wordSplit[i];
-				const wordWrapper = document.createElement("div");
-				wordWrapper.setAttribute("class", "wordWrapper");
-				if(word.match(chordregex)){
-					const wordchordsplit = word.split(chordregex);
-					let j = 0;
-					while(j < wordchordsplit.length){
-						let match = wordchordsplit[j];
-						if(match != ""){						
-							if(j%2){
-								if(wordchordsplit[j] < wordchordsplit[j+1] & !wordSplit[i+1].match(chordregex)){
-									// chord longer than lyrics and we can use next word
-									wordWrapper.appendChild(createChordLyricsWrapper(wordchordsplit[j+1] + " " + wordSplit[i+1], match));
-								}else{
-									wordWrapper.appendChild(createChordLyricsWrapper(wordchordsplit[j+1], match));
-								}
-								
-								j++;
-							}else{
-								wordWrapper.appendChild(createChordLyricsWrapper(match, ""));
-							}
-						}
-						j++;
-					}
-				}else{
-					wordWrapper.appendChild(createChordLyricsWrapper(word, ""));
-				}
-				linewrapper.appendChild(wordWrapper);
-				wordWrapper.appendChild(createChordLyricsWrapper(" ", ""));
-				linewrapper.appendChild(wordWrapper);
-				i++;
-			}
-			paragraph.appendChild(linewrapper);
 		}else if (line.match(/^{.*}/)) {
+			lastAction = "command";
+
+			//remove empety verse nodes
+			curentNode = removeVerseIfEmpty(curentNode);
+
 			//ADD COMMAND PARSING HERE
 			//reference: http://tenbyten.com/software/songsgen/help/HtmlHelp/files_reference.htm
 			// implement basic formatted text commands
-			var matches = line.match(/^{(title|t|subtitle|st|comment|c|artist|start_of_chorus|soc|end_of_|eoc|start_of_verse|sov|end_of_verse|eov|chorus|x_cht)(:\s*(.*))?}/, "i");
+			let matches = line.match(/^{(title|t|subtitle|st|comment|c|artist|start_of_chorus|soc|end_of_|eoc|start_of_verse|sov|end_of_verse|eov|chorus|x_cht)(:\s*(.*))?}/, "i");
 			if(matches != null){
 				if( matches.length >= 3 ) {
-					var command = matches[1];
-					var text = matches[3];
-					var wrap="";
+					let command = matches[1];
+					let text = matches[3];
 					//add more non-wrapping commands with this switch
 					switch( command ) {
 						case "title":
 						case "t":
-							title = text;
+							if(rootNode.title != ""){
+								console.error("Title defined more tham once!");
+							}else{
+								rootNode.title = text;
+							}
 							break;
 						case "artist":
-							artist = text;
+							if(rootNode.artist != ""){
+								console.error("Artist defined more tham once!");
+							}else{
+								rootNode.artist = text;
+							}
 							break;
 						case "subtitle":
 						case "st":
-							command = "subtitle";
-							wrap = "h4";
+							if(rootNode.subtitle != ""){
+								console.error("Subtitle defined more tham once!");
+							}else{
+								rootNode.subtitle = text;
+							}
 							break;
 						case "comment":
 						case "c":
-							command = "comment";
-							wrap    = "em";
 							break;
 						case "start_of_chorus":
 						case "soc":
-							add_verse = true
-							buffer.push(paragraph);
-							paragraph = document.createElement("p");
-							if(text != undefined){
-								verse_label = text;
-								last_chorus = verse_label;
-							}else{
-								verse_label = "R:";
-								last_chorus = "R";
-							}
-						
-							break;
-						case "end_of_chorus":
-						case "eoc":
+							curentNode = rootNode;
+							let chorusNode = new ChordProChorus(text);
+							curentNode.appendChild(chorusNode);
+							curentNode = chorusNode;
 							break;
 						case "start_of_verse":
 						case "sov":
-							add_verse = true
-							buffer.push(paragraph);
-							paragraph = document.createElement("p");
-							if(text != undefined){
-								verse_label = text;
-							}else{
-								verse_label = "V:";
+							if(curentNode.type == "verse"){
+								curentNode = curentNode.parentNode;
 							}
-						
+							let verseNode = new ChordProVerse(text);
+							curentNode.appendChild(verseNode);
+							curentNode = verseNode;
 							break;
 						case "end_of_verse":
 						case "eov":
+							if(curentNode.type === "verse"){
+								curentNode = curentNode.parentNode;
+							}
+							lastAction = "songline";
+							let tmpNode = new ChordProVerse();
+							curentNode.appendChild(tmpNode);
+							curentNode = tmpNode
+						case "end_of_chorus":
+						case "eoc":
+							lastAction = "songline";
+							if(curentNode.type !== "chorus"){
+								
+							}else{
+								curentNode = new ChordProVerse();
+								rootNode.appendChild(curentNode);
+							}
 							break;
-
 						case "x_cht":
-							buffer.push(paragraph);
-							paragraph = document.createElement("p");
-
-							let x_chtspan = document.createElement("span");
-							x_chtspan.setAttribute("class", "chorus");
-							x_chtspan.innerText = last_chorus + text
-							paragraph.appendChild(x_chtspan);
-
-							buffer.push(paragraph);
-							paragraph = document.createElement("p");
-
+							curentNode = curentNode.parentNode;
+							curentNode.appendChild(new ChordProChorusLink(text, 1));
 							break;
 						case "chorus":
-							buffer.push(paragraph);
-							paragraph = document.createElement("p");
-
-							let chtspan = document.createElement("span");
-							chtspan.setAttribute("class", "chorus");
-							chtspan.innerText = last_chorus
-							paragraph.appendChild(chtspan);
-
-							buffer.push(paragraph);
-							paragraph = document.createElement("p");
-
+							if(curentNode.appendChild === undefined | curentNode.type === "verse") {
+								curentNode = curentNode.parentNode;	
+							}
+							if(curentNode.lastChild !== undefined){
+								if(curentNode.lastChild.type === "choruslink"){
+									if(curentNode.lastChild.name === text){
+										curentNode.lastChild.times++;
+									}else{
+										curentNode.appendChild(new ChordProChorusLink(text, 1));
+									}
+								}else{
+									curentNode.appendChild(new ChordProChorusLink(text, 1));	
+								}
+							}else{
+								curentNode.appendChild(new ChordProChorusLink(text, 1));
+							}
 							break;
-					}
-					if( wrap ) {
-						let elem = document.createElement(wrap);
-						elem.setAttribute("class", command);
-						elem.innerText = text;
-
-						buffer.push(elem);
 					}
 				}
 			}
 			// work from here to add wrapping commands
 		}else if(line == ""){
 			// end verse
-			buffer.push(paragraph);
-			paragraph = document.createElement("p");
-			
-			add_verse = true
-			
+			if(lastAction != "newVerse"){
+				lastAction = "newVerse";
+				curentNode = newVerse(curentNode);
+			}
 		}else{
-			/* Anything else */
-
-			span = document.createElement("span");
-			span.setAttribute("class", "lyrics")
-			span.innerText = line;
-			linewrapper.appendChild(span);
-			br = document.createElement("br");
-			linewrapper.appendChild(br);
-			paragraph.appendChild(linewrapper)
+			/* song line */
+			lastAction = "songline";
 			
+			if(curentNode.type !== "verse" & curentNode.type !== "chorus"){
+				curentNode = new ChordProVerse();
+				rootNode.appendChild(curentNode);
+			}
+			let outLine = parseLine(line, new ChordProLine());
+			curentNode.appendChild(outLine);
 		}
 	}, this);
-	buffer.push(paragraph);
-	heading = document.createElement("h1");
-	heading.innerText = title + " - " + artist
-	buffer.unshift(heading);
-	return {
-		"title": title,
-		"artist": artist,
-		"html": buffer
-	};
+	removeVerseIfEmpty(curentNode);
+	return rootNode
 }
 
-function createChordLyricsWrapper(lyrics, chord) {
-	const chordLyricsWrapper = document.createElement("div");
-	chordLyricsWrapper.setAttribute("class", "chordLyricsWrapper");
-
-	const lyricsHolder = document.createElement("span");
-	lyricsHolder.setAttribute("class", "lyrics");
-
-	const chordHolder = document.createElement("span");
-	chordHolder.setAttribute("class", "chord");
-
-	if(chord == ""){
-		chordHolder.innerHTML = "&nbsp";
-	}else{
-		chordHolder.innerText = chord;
+function newVerse(curentNode){
+	if(!isBlankVerse(curentNode)){
+		if(curentNode.BlankLineNewVerse){
+			let verse = new ChordProVerse();
+			if(curentNode.type == "song-root"){
+				curentNode.appendChild(verse)
+			}else{
+				curentNode.parentNode.appendChild(verse)
+			}
+			
+			curentNode = verse;
+		}
 	}
+	return curentNode;
+}
 
-	chordLyricsWrapper.appendChild(chordHolder);
-
-	if(lyrics == ""){
-		lyricsHolder.innerHTML = "&nbsp";
+/**
+ * 
+ * @param {ChordProNode} node 
+ */
+function isBlankVerse(node){
+	if(node.type == "verse" & node.firstChild == undefined){
+		return true;
 	}else{
-		lyricsHolder.innerText = lyrics;
+		return false;
 	}
-	chordLyricsWrapper.appendChild(lyricsHolder);
+}
 
-	return chordLyricsWrapper;
+/**
+ * 
+ * @param {ChordProNode} innode 
+ * @returns {ChordProNode} same or parent node
+ */
+function removeVerseIfEmpty(innode){
+	let tmpNode = innode;
+	if(isBlankVerse(innode)){
+		tmpNode = innode.parentNode;
+		
+		innode.remove();
+		delete innode;
+	}
+	return tmpNode;
 }

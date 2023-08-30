@@ -33,7 +33,7 @@ h1{
 }
 
 p{
-    margin-top: 2rem;
+    margin-top: 0rem;
 }
 
 @media print {
@@ -70,9 +70,18 @@ p{
     }
 }
 
-.start_of_verse{
-    position: relative;
-    text-indent: -1em;
+.verse, .chorus{
+    display: flex;
+    flex-direction: row;
+    margin-top: 2rem;
+}
+
+/* .verseContent, .verseName{
+    display: inline-block;
+} */
+
+.verseName, .chorusName{
+    margin-right: 0.5rem;
 }
 
 .wordWrapper{
