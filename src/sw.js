@@ -91,7 +91,7 @@ async function updateSongs(){
         try {
             await songCache.add("data/" + song.file + ".chordpro");
         } catch (error) {
-            
+            console.error(error);
         }
     }
     songCache.add("data/list.json");
