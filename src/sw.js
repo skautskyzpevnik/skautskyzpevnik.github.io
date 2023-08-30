@@ -81,6 +81,18 @@ async function redownloadfull(clientjson, cache){
         await insertToCache(cache, clientjson.resources);
 }
 
+async function updateSongs(){
+    let list = await fetch("data/list.json");
+    list = await list.json();
+    let songCache = await caches.open("songCache");
+    await cleanCache(songCache);
+    for(song in list){
+        song = list[song];
+        await songCache.add("data/" + song.file + ".chordpro");
+    }
+    songCache.add("data/list.json");
+}
+
 async function updateCache(){
     try {
         let cache = await caches.open(swSettings.cacheName);
@@ -108,6 +120,7 @@ async function updateCache(){
     } catch (error) {
         console.error(error);
     }
+    //await updateSongs();
 }
 
 self.addEventListener("install", event => {
@@ -115,9 +128,15 @@ self.addEventListener("install", event => {
     event.waitUntil(updateCache());
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', async function(event){
+    let url = new URL(event.request.url);
+    url.search = '';
+    url.fragment = '';
+
+    let cleanRequest = new Request(url);
+
     event.respondWith(
-        caches.match(event.request).then((response) => {
+        caches.match(cleanRequest).then((response) => {
             return response || fetch(event.request);
         })
     );
