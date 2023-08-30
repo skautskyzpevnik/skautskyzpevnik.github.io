@@ -41,8 +41,7 @@ function addButton(url, text){
 }
 
 async function render(searchString) {
-    let list = await fetch("data/list.json");
-    list = await list.json();
+    let list = JSON.parse(localStorage.getItem("list"));
     const result = search(searchString, list)
     document.getElementById("resultHolder").innerHTML = "";
 
@@ -50,6 +49,36 @@ async function render(searchString) {
         document.getElementById("resultHolder").appendChild(addButton("render.html?songname=" + song.file, song.title + " - " + song.artist));
     });
 }
+
+/**
+ * delete all keys from selected cache
+ * @param {Cache} cache cache to delete all keys from
+ */
+async function cleanCache(cache){
+    let keys = await cache.keys();
+    for(x in keys){
+        cache.delete(keys[x])
+    }
+}
+
+async function TestSongList(){
+    let list = await fetch("data/list.json");
+    list = await list.text();
+    if(list !== localStorage.getItem("list")){
+        let parsedList = JSON.parse(list);
+        let songCache = await caches.open("songCache");
+        await cleanCache(songCache);
+        for(song in parsedList){
+            song = parsedList[song];
+            await songCache.add("data/" + song.file + ".chordpro");
+        } 
+        localStorage.setItem("list", list)
+    }
+}
+
+TestSongList()
+
+
 
 document.getElementById("search").value = "";
 
