@@ -1,7 +1,6 @@
 class SonglistSong{
     title;
     artist;
-
 }
 
 class Songlist{
@@ -16,6 +15,7 @@ class Songlist{
                 song = songList[song];
                 this.#songList.push(song);
             };
+            await this.#offline(this.#songList);
         }
     }
 
@@ -61,9 +61,9 @@ class Songlist{
         if(title !== undefined & title !== ""){
             filteredSonglist = this.#titleSearch(filteredSonglist, title);
         }
-        if(artist !== undefined & title !== ""){
-            filteredSonglist = this.#artistSearch(filteredSonglist, artist);
-        }
+        // if(artist !== undefined & artist !== ""){
+        //     filteredSonglist = this.#artistSearch(filteredSonglist, artist);
+        // }
         return filteredSonglist;
     }
 
@@ -79,15 +79,15 @@ class Songlist{
         let offlineSongs = [];
         for(let song of filteredSonglist){
             let songfile = song.file.split("/")[1];
-            let finalSong = undefined;
+            song.offline = false;
             for(let request of offlineSongsRequests){
                 let requestSongFile = extractFilenameFromURL(request.url);
                 if(songfile === requestSongFile){
-                    finalSong = requestSongFile;
+                    song.offline = true;
                     break;
                 }
             }
-            if((offline & finalSong !== undefined) | (!offline & finalSong === undefined)){
+            if((offline & song.offline) | (!offline & song.offline)){
                 offlineSongs.push(song);
             }
         }
@@ -101,4 +101,5 @@ async function loadSongs(){
     await songList.prepare();
     eventmanager.fireevent("songsloaded");
 }
-loadSongs();
+
+eventmanager.addEventListener(["utilsloaded"], loadSongs);

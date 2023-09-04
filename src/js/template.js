@@ -39,7 +39,8 @@ class Events{
     "navloaded": false,
     "fooloaded": false,
     "utilsloaded": false,
-    "songsloaded": false
+    "songsloaded": false,
+    "downloadManagerloaded": false
   }
 
   /**
@@ -47,6 +48,10 @@ class Events{
    * @param {string} eventname name of event 
    */
   fireevent(eventname){
+    if(this.fired[eventname]){
+      throw new Error("Event fired twice");
+    }
+    console.log("Fired event: " + eventname);
     this.fired[eventname] = true;
     let i = 0;
     while(i < this.waiting.length){
@@ -57,9 +62,10 @@ class Events{
 
       if(this.waiting[i].events.length == 0){
         this.waiting[i].fnc();
+        this.waiting.splice(i,1);
+      }else{
+        i++;
       }
-
-      i++;
     }
   }
 
