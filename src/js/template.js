@@ -22,21 +22,24 @@ for the JavaScript code in this page.
 
 let prefix = getPrefix();
 
+class Waiting{
+  constructor(events, fnc){
+    this.events = events;
+    this.fnc = fnc;
+  }
+}
+
 /**
  * Class for loading management
  */
-class events{
-  event = {
-    "settingsloaded": new Event('settingsloaded'),
-    "navloaded": new Event('navloaded'),
-    "fooloaded": new Event('fooloaded'),
-    "layoutloaded": new Event('layoutloaded'), //TODO implement this
-  };
+class Events{
+  waiting = [];
   fired = {
     "settingsloaded": false,
     "navloaded": false,
     "fooloaded": false,
-    "layoutloaded": false
+    "utilsloaded": false,
+    "songsloaded": false
   }
 
   /**
@@ -45,24 +48,48 @@ class events{
    */
   fireevent(eventname){
     this.fired[eventname] = true;
-    window.dispatchEvent(this.event[eventname]);
+    let i = 0;
+    while(i < this.waiting.length){
+      let index = this.waiting[i].events.findIndex(function(name){return name === eventname});
+      if(index != -1){
+        this.waiting[i].events.splice(index, 1);
+      }
+
+      if(this.waiting[i].events.length == 0){
+        this.waiting[i].fnc();
+      }
+
+      i++;
+    }
   }
 
   /**
    * Registers event listener or if already fired, calls the listener.
-   * @param {string} name 
+   * @param {string|Array} name 
    * @param {function} listener 
    */
   addEventListener(name, listener) {
-    if(this.fired[name]){
+    if(typeof name === "string"){
+      name = [name];      
+    }
+    let eventArray = [];
+    for(let eventName in name){
+      eventName = name[eventName];
+      if(this.fired[eventName] === undefined){
+        throw new Error("Unknown event");
+      }else if(!this.fired[eventName]){
+        eventArray.push(eventName);
+      }
+    }
+    if(eventArray.length == 0){
       listener();
     }else{
-      window.addEventListener(name, listener);
+      this.waiting.push(new Waiting(eventArray, listener));
     }
   }
 }
 
-eventmanager = new events();
+const eventmanager = new Events();
 
 /**
  * extracts prefix for urls from meta tags
@@ -83,7 +110,7 @@ function getPrefix(){
 }
 
 //include all required scripts
-include(["js/bg.js", "js/settings.js"]);
+include(["js/utils.js","js/bg.js", "js/settings.js"]);
 add_css(["css/style.css"]);
 add_manifest("manifest.webmanifest");
 add_favicon("favicon.ico");

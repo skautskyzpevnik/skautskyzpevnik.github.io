@@ -1,66 +1,104 @@
-/**
- * Searches array.title for strings starting with string
- * @param {string} string SearchString
- * @param {Object} array array to search in
- * @returns {Array} Array of results
- */
-function search(string, array){
-    const results = [];
-    for(let song in array){
-        let isSame = true;
-        song = array[song];
-        for(i=0; i < string.length; i++){
-            if(string.charAt(i).toLowerCase() != song.title.charAt(i).toLowerCase()){
-                isSame = false;
-                break;
+class SonglistSong{
+    title;
+    artist;
+
+}
+
+class Songlist{
+    #songList = [];
+    constructor(){
+    }
+    async prepare(){
+        if(this.#songList.length == 0){
+            let list = await fetch("data/list.json");
+            let songList = await list.json();
+            for(let song in songList){
+                song = songList[song];
+                this.#songList.push(song);
+            };
+        }
+    }
+
+    /**
+     * Returns array of songs of matching functions.
+     * @param {Function} testFnc if returns true song is inclueded
+     * @returns {Array}
+     */
+    #filter(filteredSonglist, testFnc){
+        const results = [];
+        for(let song of filteredSonglist){
+            if(testFnc(song)){
+                results.push(song);
             }
         }
-        if(isSame){
-            results.push(song);
+        return results;
+    }
+
+    #titleSearch(filteredSonglist, string){
+        return this.#filter(filteredSonglist, function(song) {
+            return song.title.toLowerCase().includes(string.toLowerCase());
+        });
+    }
+
+    #artistSearch(filteredSonglist, string){
+        return this.#filter(filteredSonglist, function(song) {
+            return song.artist.toLowerCase().includes(string.toLowerCase());
+        });
+    }
+
+    /**
+     * Searches all songs and returns array matching the criteria
+     * @param {string} title songtitle (all if undefined)
+     * @param {string} artist (all if undefined)
+     * @param {boolean} offline (all if undefined)
+     * @returns {Promise} Array matching songs
+     */
+    async search(title, artist, offline){
+        let filteredSonglist = this.#songList;
+        if(offline !== undefined){
+            filteredSonglist = await this.#offline(filteredSonglist, offline);
         }
+        if(title !== undefined & title !== ""){
+            filteredSonglist = this.#titleSearch(filteredSonglist, title);
+        }
+        if(artist !== undefined & title !== ""){
+            filteredSonglist = this.#artistSearch(filteredSonglist, artist);
+        }
+        return filteredSonglist;
     }
-    return results;
-}
 
-/**
- * returns button with specified text pointing to specified url
- * @param {string} url url to redirect after click
- * @param {string} text text of button
- */
-function addButton(url, text){
-    const button = document.createElement("button");
-    button.setAttribute("class", "button button2");
-    button.setAttribute("data-url",url);
-    button.innerText = text;
-
-    button.addEventListener("click", function(event){
-        let url = event.target.getAttribute("data-url");
-        window.location.href=(url)
-    });
-    return button;
-}
-
-async function render(searchString) {
-    let list = await fetch("data/list.json");
-    list = await list.json();
-    const result = search(searchString, list)
-    document.getElementById("resultHolder").innerHTML = "";
-
-    result.forEach(song => {
-        document.getElementById("resultHolder").appendChild(addButton("render.html?songname=" + song.file, song.title + " - " + song.artist));
-    });
-}
-
-
-
-document.getElementById("search").value = "";
-
-document.getElementById("search").addEventListener("keyup", function(event){
-    const searchString = event.target.value;
-    if(searchString.length == 0){
-        document.getElementById("resultHolder").innerHTML = "";
-    }else{
-        render(searchString);
+    /**
+     * Filters by offline avalibility of songs 
+     * @param {Array} filteredSonglist 
+     * @param {boolean} offline return only offline
+     * @returns {Promise} Array matching songs
+     */
+    async #offline(filteredSonglist, offline){
+        let cache = await caches.open("songCache");
+        let offlineSongsRequests = await cache.keys();
+        let offlineSongs = [];
+        for(let song of filteredSonglist){
+            let songfile = song.file.split("/")[1];
+            let finalSong = undefined;
+            for(let request of offlineSongsRequests){
+                let requestSongFile = extractFilenameFromURL(request.url);
+                if(songfile === requestSongFile){
+                    finalSong = requestSongFile;
+                    break;
+                }
+            }
+            if((offline & finalSong !== undefined) | (!offline & finalSong === undefined)){
+                offlineSongs.push(song);
+            }
+        }
+        return offlineSongs;
     }
-});
+}
 
+const songList = new Songlist();
+
+async function loadSongs(){
+    await songList.prepare();
+    eventmanager.fireevent("songsloaded");
+}
+loadSongs();

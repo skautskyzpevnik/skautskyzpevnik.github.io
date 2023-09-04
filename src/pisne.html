@@ -10,13 +10,19 @@
         <title>Písně</title>
         <script src="js/template.js" defer></script>
         <script src="js/search.js" defer></script>
+        <script src="js/songs.js" defer></script>
         <link href="css/pisne.css" rel="stylesheet">
     </head>
     <body>
         <div id="content">
             <h1 class="mainh">Vyhledávání</h2>
-            <label for="search">Název písně:</label>
-            <input id="search">
+            <label for="songname">Název písně:</label>
+            <input id="songname">
+            <h2>filtry:</h2>
+            <label for="offline">pouze stažené:</label>
+            <input id="offline" type="checkbox">
+            <label for="artist">Interpret:</label>
+            <input id="artist">
             <div id="resultHolder">
 
             </div>
