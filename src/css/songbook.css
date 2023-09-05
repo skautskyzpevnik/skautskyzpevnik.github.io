@@ -1,0 +1,11 @@
+.titlepageholder{
+    width: 21rem;
+    height: 29.7rem;
+    margin: 1rem;
+}
+
+#songbook-holder{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}

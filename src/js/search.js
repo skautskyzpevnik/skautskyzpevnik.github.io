@@ -5,17 +5,21 @@ class SonglistSong{
 
 class Songlist{
     #songList = [];
+    songBooks = [];
     constructor(){
     }
     async prepare(){
         if(this.#songList.length == 0){
             let list = await fetch("data/list.json");
-            let songList = await list.json();
+            list = await list.json();
+            let songList = list.songs;
             for(let song in songList){
                 song = songList[song];
                 this.#songList.push(song);
             };
             await this.#offline(this.#songList);
+            
+            this.songBooks = list.songbooks;
         }
     }
 

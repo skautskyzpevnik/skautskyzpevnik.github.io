@@ -1,20 +1,3 @@
-/**
- * 
- * @param {HTMLElement} node 
- * @param {*} cssClass 
- * @returns 
- */
-function getParentByClass(node, cssClass){
-    let returnNode = undefined;
-    while(node.parentElement !== undefined & returnNode === undefined){
-        if(Array.from(node.classList).includes(cssClass)){
-            returnNode = node;
-        }
-        node = node.parentElement;
-    }
-    return returnNode;
-}
-
 function createSongDiv(song){
     const div = document.createElement("div");
     div.setAttribute("data-songfile", song.file);

@@ -1,22 +1,62 @@
 const url = new URL(window.location.href);
 const songName = url.searchParams.get('songname');
-const all = url.searchParams.get('all');
+const songBook = url.searchParams.get('songbook');
 
-if(all === "true"){
+if(songBook === "all"){
 	renderAll();
-}else if(songName != undefined){
-	getSongByname(songName);
+}else if(songBook !== null){
+	renderSongbook(songBook)
+}else if(songName !== undefined){
+	getSongByname(songName, true);
+}
+
+function findSong(list, title, artist){
+	let result = undefined;
+	for(let song in list.songs){
+		song = list.songs[song];
+		if(song.title == title & song.artist == artist){
+			result = song;
+			break;
+		}
+	}
+	return result;
+}
+
+async function renderSongbook(songbookName){
+	let list = await fetch("data/list.json");
+    list = await list.json();
+	let songbook = undefined;
+	for( let testSongBook of list.songbooks){
+		if(songbookName == testSongBook.file){
+			songbook = await fetch("data/" + testSongBook.file);
+			songbook = await songbook.json();
+			break;
+		}
+	}
+	if(songbook === undefined){
+		alert("Zpěvník neexistuje");
+	}else{
+		document.title = songbook.title;
+		document.getElementById("rendering-target").appendChild(titlePageCreator(songbook.title, songbook.subtitle));
+		for(song of songbook.songs){
+			song = findSong(list, song.title, song.artist);
+			if(song.file === undefined){
+				alert("Píseň \"" + song.title + "\" neexistuje");
+			}
+			getSongByname(song.file, false);
+		}
+	}
 }
 
 async function renderAll(){
 	let list = await fetch("data/list.json");
     list = await list.json();
-	for(song in list){
-		getSongByname(list[song].file);
+	for(song in list.songs){
+		getSongByname(list[song].file, false);
 	}
 }
 
-async function getSongByname(songName){
+async function getSongByname(songName, setPageTitle){
 	let chordPro = undefined;
 	try{
 		chordPro = await fetch("data/"+songName+".chordpro");
@@ -32,7 +72,7 @@ async function getSongByname(songName){
 	document.getElementById("rendering-target").appendChild(html);
 
 	//Bad for SEO
-	if(song.title != ""){
+	if(song.title != "" & setPageTitle){
 		document.title = song.title + " - " + song.artist;
 	}
 }
@@ -41,12 +81,19 @@ function ChordProRender(songRoot){
 	if(songRoot === undefined){
 		throw Error("songRoot can not be undefined");
 	}
+	const songHolder = document.createElement("div");
+	songHolder.setAttribute("class", "songholder");
+	songHolder.setAttribute("data-title", songRoot.title);
+	songHolder.setAttribute("data-artist", songRoot.artist);
+
 	heading = document.createElement("h1");
 	heading.innerText = songRoot.title + " - " + songRoot.artist;
-	document.getElementById("rendering-target").appendChild(heading);
+	songHolder.appendChild(heading);
+
 	let verseNumber = 1;
 	let result = ChordProRenderRecursiveIterator(songRoot, document.createElement("div"), songRoot.type, verseNumber, undefined, songRoot)
-	return result;
+	songHolder.appendChild(result)
+	return songHolder;
 }
 
 /**

@@ -44,8 +44,11 @@ p{
     body{
         width: 21cm;
         height: 29.7cm;
-        margin: 30mm 45mm 30mm 45mm;
-    } 
+        /*margin: 30mm 45mm 30mm 45mm;*/
+    }
+    .songholder{
+        page-break-after: always;
+    }
 }
 @media screen {
     html{
@@ -87,4 +90,17 @@ p{
 .wordWrapper{
     display: inline-block;
     white-space: nowrap;
+}
+
+.titlepageholder{
+    height: 29.7cm;
+    page-break-after: always;
+}
+
+.titlepageholder h2{
+    font-size: 5rem;
+}
+
+.titlepageholder h1{
+    font-size: 10rem;
 }

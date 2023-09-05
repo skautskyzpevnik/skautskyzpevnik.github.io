@@ -40,7 +40,8 @@ class Events{
     "fooloaded": false,
     "utilsloaded": false,
     "songsloaded": false,
-    "downloadManagerloaded": false
+    "downloadManagerloaded": false,
+    "titlePageCreatorloaded": false
   }
 
   /**
@@ -61,8 +62,9 @@ class Events{
       }
 
       if(this.waiting[i].events.length == 0){
-        this.waiting[i].fnc();
+        let fnc = this.waiting[i].fnc;
         this.waiting.splice(i,1);
+        fnc();
       }else{
         i++;
       }

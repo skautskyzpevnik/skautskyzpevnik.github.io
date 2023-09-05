@@ -1,0 +1,26 @@
+.titlepageholder{
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+.titlepageholder h1, .titlepageholder h2{
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Times New Roman';
+}
+
+.titlepageholder h1{
+    margin-top: 0rem;
+}
+
+.titlepageholder img, .titlepageholder h1, .titlepageholder h2{
+    flex-shrink: 1;
+    flex-grow: 1;
+    min-height: 0em;
+}
+
+.titlepageholder .logo{
+    margin-top: 2rem;
+    height: 30%;
+}
