@@ -5,4 +5,9 @@ eventmanager.addEventListener(["titlePageCreatorloaded", "songsloaded"], functio
         location.href = url; 
     },"render.html?songbook=" + songBook.file));
     });
+    // document.getElementById("addsongbook").addEventListener("click", function() {
+    //     let title = prompt("Zadejte název zpěvníku");
+    //     let subtitle = prompt("Zadejte podnázev zpěvníku");
+    //     songList.addSongbook(title, subtitle);
+    // });
 });

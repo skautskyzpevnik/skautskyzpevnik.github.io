@@ -9,3 +9,21 @@
     flex-direction: row;
     flex-wrap: wrap;
 }
+
+#addsongbook{
+    margin: 0;
+    background-color: #4CAF50; /* Green */
+    border: none;
+    padding: 0.5rem;
+    font-weight: bold;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    width: fit-content;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    border-radius: 0.5rem;
+    margin-left: 0.5rem;
+}

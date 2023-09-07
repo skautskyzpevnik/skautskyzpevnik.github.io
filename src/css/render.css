@@ -2,10 +2,10 @@
     margin: 0;
 }
 
-body{
+#rendering-target{
     background-image: url("../img/render.png");
     background-repeat: repeat-y;
-    background-size: auto 34.2cm;
+    background-size: 21cm 31.35cm;
 }
 
 h1{

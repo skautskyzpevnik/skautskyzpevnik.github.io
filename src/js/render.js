@@ -37,7 +37,7 @@ async function renderSongbook(songbookName){
 		alert("Zpěvník neexistuje");
 	}else{
 		document.title = songbook.title;
-		document.getElementById("rendering-target").appendChild(titlePageCreator(songbook.title, songbook.subtitle));
+		document.body.insertBefore(titlePageCreator(songbook.title, songbook.subtitle), document.body.firstChild);
 		for(song of songbook.songs){
 			song = findSong(list, song.title, song.artist);
 			if(song.file === undefined){

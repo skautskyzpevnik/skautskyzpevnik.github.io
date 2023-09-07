@@ -1,3 +1,13 @@
+function extractFilenameFromURL(url){
+    let filename = url.split("/");
+    filename = filename[filename.length-1].split("#")[0].split("?")[0];
+    filename = filename.split('.').slice(0, -1).join('.');
+    if(filename == ""){
+        filename = "index";
+    }
+    return filename;
+}
+
 class SonglistSong{
     title;
     artist;
@@ -5,7 +15,7 @@ class SonglistSong{
 
 class Songlist{
     #songList = [];
-    songBooks = [];
+    #songBooks = [];
     constructor(){
     }
     async prepare(){
@@ -19,7 +29,85 @@ class Songlist{
             };
             await this.#offline(this.#songList);
             
-            this.songBooks = list.songbooks;
+            this.#songBooks = list.songbooks;
+        }
+    }
+
+    get songBooks(){
+        let songbooks = this.#songBooks;
+        for(let songbook of this.localSongbooks){
+            songbooks.push(songbook);
+        }
+        return songbooks;
+    }
+
+    get localSongbooks(){
+        let songbooks = [];
+        if(window.localStorage){
+            let localSongbooks = JSON.parse(window.localStorage.getItem("songbooks"));
+            if(localSongbooks){
+                for(let songbook of localSongbooks){
+                    songbook = JSON.parse(window.localStorage.getItem(songbook));
+                    if(songbook){
+                        songbooks.push(songbook);
+                    }
+                }
+            }
+        }
+        return songbooks;
+    }
+
+    #updateSongbookNoChecks(title, subtitle, songs){
+        let songbook = {"title":title, "subtitle":subtitle, "songs": songs};
+        window.localStorage.setItem("songbook-"+title+subtitle, JSON.stringify(songbook));
+    }
+
+    updateSongbook(title, subtitle, songs){
+        if(window.localStorage){
+            let localSongbooks = JSON.parse(window.localStorage.getItem("songbook-"+title+subtitle));
+            if(localSongbooks == null){
+                return false;
+            }else{
+                this.#updateSongbookNoChecks(title, subtitle, songs);
+            }
+        }
+    }
+
+    addSongbook(title, subtitle, songs){
+        if(window.localStorage){
+            if(window.localStorage.getItem("songbook-"+title+subtitle)){
+                return false;
+            }else{
+                this.#updateSongbookNoChecks(title, subtitle, songs);
+                let localSongbooks = JSON.parse(window.localStorage.getItem("songbooks"));
+                if(localSongbooks == null){
+                    localSongbooks = [];
+                }
+                localSongbooks.push("songbook-"+title+subtitle);
+                window.localStorage.setItem("songbooks", JSON.stringify(localSongbooks));
+                return true;
+            }
+        }else{
+            return undefined;
+        }
+    }
+
+    removeSongbook(title, subtitle){
+        if(window.localStorage){
+            let localSongbooks = JSON.parse(window.localStorage.getItem("songbooks"));
+            if(localSongbooks == null){
+                return false;
+            }else{
+                let index = localSongbooks.indexOf("songbook-"+title+subtitle);
+                if(index != -1){
+                    localSongbooks.slice(index, 1);
+                }
+                window.localStorage.setItem("songbooks", JSON.stringify(localSongbooks));
+                window.localStorage.removeItem("songbook-"+title+subtitle);
+                return true;
+            }
+        }else{
+            return undefined;
         }
     }
 
@@ -103,7 +191,9 @@ const songList = new Songlist();
 
 async function loadSongs(){
     await songList.prepare();
-    eventmanager.fireevent("songsloaded");
+    if(eventmanager){
+        eventmanager.fireevent("songsloaded");
+    }
 }
 
-eventmanager.addEventListener(["utilsloaded"], loadSongs);
+loadSongs();
