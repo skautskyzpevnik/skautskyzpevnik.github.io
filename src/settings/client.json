@@ -1,5 +1,5 @@
 {
-    "version": 0.2,
+    "version": 0.3,
     "resources":[
         "",
         "index.html",
@@ -9,10 +9,12 @@
         "nastaveni.html",
         "akordy.html",
         "kontakty.html",
+        "zpevniky.html",
         "include/nav.html",
         "include/footer.html",
         "formulare.html",
         "img/favicon.svg",
+        "img/skautlogo.svg",
         "css/onas.css",
         "css/settings.css",
         "css/style.css",
@@ -22,6 +24,8 @@
         "css/pisne.css",
         "css/akordy.css",
         "css/index.css",
+        "css/songbook.css",
+        "css/titlepage.css",
         "js/render.js",
         "js/bg.js",
         "js/search.js",
@@ -29,7 +33,13 @@
         "js/template.js",
         "js/settings.js",
         "js/settingsio.js",
-        "settings/client.json",
+        "js/songbook.js",
+        "js/songs.js",
+        "js/titlepagecreator.js",
+        "js/utils.js",
+        "js/downloadManager/index.js",
+        "js/downloadManager/utils.js",
+        "js/downloadManager/worker.js",
         "settings/translation.json"
     ]
 }

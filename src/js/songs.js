@@ -1,3 +1,8 @@
+import { songList } from "./search.js";
+import { getParentByClass } from "./utils.js";
+import { downloadManagerInstance } from "./downloadManager/index.js"
+
+
 function createSongDiv(song){
     const div = document.createElement("div");
     div.setAttribute("data-songfile", song.file);
@@ -63,15 +68,13 @@ async function renderSongs() {
 document.getElementById("songname").value = "";
 document.getElementById("artist").value = "";
 
-eventmanager.addEventListener(["utilsloaded", "songsloaded", "downloadManagerloaded"], function(){
+renderSongs();
+document.getElementById("songname").addEventListener("keyup", function(event){
     renderSongs();
-    document.getElementById("songname").addEventListener("keyup", function(event){
-        renderSongs();
-    });
-    document.getElementById("offline").addEventListener("click", function(event){
-        renderSongs();
-    });
-    document.getElementById("artist").addEventListener("keyup", function(event){
-        renderSongs();
-    });
+});
+document.getElementById("offline").addEventListener("click", function(event){
+    renderSongs();
+});
+document.getElementById("artist").addEventListener("keyup", function(event){
+    renderSongs();
 });

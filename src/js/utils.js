@@ -1,4 +1,4 @@
-function extractFilenameFromURL(url){
+export function extractFilenameFromURL(url){
     let filename = url.split("/");
     filename = filename[filename.length-1].split("#")[0].split("?")[0];
     filename = filename.split('.').slice(0, -1).join('.');
@@ -14,7 +14,7 @@ function extractFilenameFromURL(url){
  * @param {*} cssClass 
  * @returns 
  */
-function getParentByClass(node, cssClass){
+export function getParentByClass(node, cssClass){
     let returnNode = undefined;
     while(node.parentElement !== undefined & returnNode === undefined){
         if(Array.from(node.classList).includes(cssClass)){
@@ -24,5 +24,3 @@ function getParentByClass(node, cssClass){
     }
     return returnNode;
 }
-
-eventmanager.fireevent("utilsloaded");

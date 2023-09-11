@@ -4,7 +4,7 @@ for(let i =  "a".charCodeAt(0); i< "z".charCodeAt(0)+1; i++){
     alphabet.push(String.fromCharCode(i));
 }
 
-function generateUID(length){
+export function generateUID(length){
     let id = ""
     for (let i = 0; i < length; i++) {
         let number = Math.floor(Math.random() * (alphabet.length * 2 + 10));

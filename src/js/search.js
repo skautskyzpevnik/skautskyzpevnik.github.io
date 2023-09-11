@@ -16,9 +16,10 @@ class SonglistSong{
 class Songlist{
     #songList = [];
     #songBooks = [];
+    #localSongbooks = [];
     constructor(){
     }
-    async prepare(){
+    async #prepare(){
         if(this.#songList.length == 0){
             let list = await fetch("data/list.json");
             list = await list.json();
@@ -31,30 +32,35 @@ class Songlist{
             
             this.#songBooks = list.songbooks;
         }
+        await this.#localSongbooksLoad();
     }
 
-    get songBooks(){
+    async songBooks(){
+        await this.#prepare();
         let songbooks = this.#songBooks;
-        for(let songbook of this.localSongbooks){
+        for(let songbook of this.#localSongbooks){
             songbooks.push(songbook);
         }
         return songbooks;
     }
 
-    get localSongbooks(){
-        let songbooks = [];
+    async localSongbooks(){
+        this.#prepare();
+        return this.#localSongbooks;
+    }
+
+    #localSongbooksLoad(){
         if(window.localStorage){
             let localSongbooks = JSON.parse(window.localStorage.getItem("songbooks"));
             if(localSongbooks){
                 for(let songbook of localSongbooks){
                     songbook = JSON.parse(window.localStorage.getItem(songbook));
                     if(songbook){
-                        songbooks.push(songbook);
+                        this.localSongbooks.push(songbook);
                     }
                 }
             }
         }
-        return songbooks;
     }
 
     #updateSongbookNoChecks(title, subtitle, songs){
@@ -146,6 +152,7 @@ class Songlist{
      * @returns {Promise} Array matching songs
      */
     async search(title, artist, offline){
+        await this.#prepare();
         let filteredSonglist = this.#songList;
         if(offline !== undefined){
             filteredSonglist = await this.#offline(filteredSonglist, offline);
@@ -153,9 +160,9 @@ class Songlist{
         if(title !== undefined & title !== ""){
             filteredSonglist = this.#titleSearch(filteredSonglist, title);
         }
-        // if(artist !== undefined & artist !== ""){
-        //     filteredSonglist = this.#artistSearch(filteredSonglist, artist);
-        // }
+        if(artist !== undefined & artist !== ""){
+            filteredSonglist = this.#artistSearch(filteredSonglist, artist);
+        }
         return filteredSonglist;
     }
 
@@ -187,13 +194,4 @@ class Songlist{
     }
 }
 
-const songList = new Songlist();
-
-async function loadSongs(){
-    await songList.prepare();
-    if(eventmanager){
-        eventmanager.fireevent("songsloaded");
-    }
-}
-
-loadSongs();
+export const songList = new Songlist();

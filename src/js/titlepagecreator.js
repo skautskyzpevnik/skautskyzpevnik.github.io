@@ -1,4 +1,4 @@
-function titlePageCreator(title, subtitle, onclick=function(){}, url=undefined){
+export function titlePageCreator(title, subtitle, onclick=function(){}, url=undefined){
     const titlePageHolder = document.createElement("div");
     titlePageHolder.setAttribute("class", "titlepageholder");
     titlePageHolder.setAttribute("data-url", url);
@@ -23,8 +23,4 @@ function titlePageCreator(title, subtitle, onclick=function(){}, url=undefined){
     titlePageHolder.appendChild(skautLogo);
 
     return titlePageHolder;
-}
-
-if(typeof eventmanager !== "undefined"){
-    eventmanager.fireevent("titlePageCreatorloaded");
 }

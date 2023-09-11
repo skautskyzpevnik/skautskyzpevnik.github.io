@@ -21,8 +21,8 @@ for the JavaScript code in this page.
 */
 
 const swSettings = {
-    "verison": 0.1,
-    "ExpectedCacheVersion": 0.1,
+    "verison": 0.3,
+    "ExpectedCacheVersion": 0.3,
     "cacheName": "zpevnik",
     "cacheFile": "settings/client.json" 
 }
@@ -81,50 +81,17 @@ async function redownloadfull(clientjson, cache){
         await insertToCache(cache, clientjson.resources);
 }
 
-async function updateSongs(){
-    let list = await fetch("data/list.json");
-    list = await list.json();
-    let songCache = await caches.open("songCache");
-    await cleanCache(songCache);
-    for(song in list){
-        song = list[song];
-        try {
-            await songCache.add("data/" + song.file + ".chordpro");
-        } catch (error) {
-            console.error(error);
-        }
-    }
-    songCache.add("data/list.json");
-}
-
 async function updateCache(){
     try {
         let cache = await caches.open(swSettings.cacheName);
     
         let req = new Request(swSettings.cacheFile);
         let res  = await fetch(req);
-        let cachedjson = await cache.match(req);
-        let versions = res.clone();
-        let json = await versions.json();
-
-        if(cachedjson === undefined){
-            await redownloadfull(json, cache);
-            // console.log("Downlading all cache items");
-        }else{
-            cachedjson = await cachedjson.json();
-            if(json.version != cachedjson.version){
-                await redownloadfull(json, cache);
-                // console.log("Updating all cache items");
-            }else{
-                // console.log("Cache is already downloaded and up to date");
-            }
-        }
-        req = new Request(swSettings.cacheFile);
-        cache.put(req, res);
+        let json = await res.json();
+        await redownloadfull(json, cache);
     } catch (error) {
         console.error(error);
     }
-    await updateSongs();
 }
 
 self.addEventListener("install", event => {

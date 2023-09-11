@@ -19,85 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 @licend  The above is the entire license notice
 for the JavaScript code in this page.
 */
-
-let prefix = getPrefix();
-
-class Waiting{
-  constructor(events, fnc){
-    this.events = events;
-    this.fnc = fnc;
-  }
-}
-
-/**
- * Class for loading management
- */
-class Events{
-  waiting = [];
-  fired = {
-    "settingsloaded": false,
-    "navloaded": false,
-    "fooloaded": false,
-    "utilsloaded": false,
-    "songsloaded": false,
-    "downloadManagerloaded": false,
-    "titlePageCreatorloaded": false
-  }
-
-  /**
-   * For fireing event
-   * @param {string} eventname name of event 
-   */
-  fireevent(eventname){
-    if(this.fired[eventname]){
-      throw new Error("Event fired twice");
-    }
-    console.log("Fired event: " + eventname);
-    this.fired[eventname] = true;
-    let i = 0;
-    while(i < this.waiting.length){
-      let index = this.waiting[i].events.findIndex(function(name){return name === eventname});
-      if(index != -1){
-        this.waiting[i].events.splice(index, 1);
-      }
-
-      if(this.waiting[i].events.length == 0){
-        let fnc = this.waiting[i].fnc;
-        this.waiting.splice(i,1);
-        fnc();
-      }else{
-        i++;
-      }
-    }
-  }
-
-  /**
-   * Registers event listener or if already fired, calls the listener.
-   * @param {string|Array} name 
-   * @param {function} listener 
-   */
-  addEventListener(name, listener) {
-    if(typeof name === "string"){
-      name = [name];      
-    }
-    let eventArray = [];
-    for(let eventName in name){
-      eventName = name[eventName];
-      if(this.fired[eventName] === undefined){
-        throw new Error("Unknown event");
-      }else if(!this.fired[eventName]){
-        eventArray.push(eventName);
-      }
-    }
-    if(eventArray.length == 0){
-      listener();
-    }else{
-      this.waiting.push(new Waiting(eventArray, listener));
-    }
-  }
-}
-
-const eventmanager = new Events();
+const prefix = getPrefix();
 
 /**
  * extracts prefix for urls from meta tags
@@ -131,6 +53,7 @@ add_favicon("favicon.ico");
 function add_js(url){
   const script = document.createElement("script");
   script.setAttribute("src", url);
+  script.setAttribute("type", "module");
   return script;
 }
 
@@ -201,7 +124,6 @@ async function build_nav(){
     nav.innerHTML = res;  //this should be save while it is managed by server - independently on user input
     set_active(nav);
     document.body.insertBefore(nav, document.body.firstElementChild);
-    eventmanager.fireevent("navloaded");
 }
 
 /**
@@ -213,7 +135,6 @@ async function build_foo(){
     const foo = document.createElement("footer");
     foo.innerHTML = res;
     document.body.appendChild(foo);
-    eventmanager.fireevent("fooloaded");
 }
 
 /**

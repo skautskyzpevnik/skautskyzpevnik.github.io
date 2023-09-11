@@ -233,7 +233,7 @@ class ChordProText extends ChordProTextNode{
 }
 
 /* Parse a ChordPro template */
-function parseChordPro(template){
+export function parseChordPro(template){
 
 	const chordregex = /\[([^\]]*)\]/;
 	if(!template){
@@ -441,7 +441,6 @@ function removeVerseIfEmpty(innode){
 		tmpNode = innode.parentNode;
 		
 		innode.remove();
-		delete innode;
 	}
 	return tmpNode;
 }

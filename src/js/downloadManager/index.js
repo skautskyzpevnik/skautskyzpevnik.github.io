@@ -1,3 +1,5 @@
+import { generateUID } from "./utils.js"
+
 class DownloadManagerWorkerMsgData{
     type;
     toDownload;
@@ -77,10 +79,7 @@ class DownloadManager{
     }
 }
 
-const downloadManagerInstance = new DownloadManager();
-if(eventmanager !== undefined){
-    eventmanager.fireevent("downloadManagerloaded");
-}
+export const downloadManagerInstance = new DownloadManager();
 
 if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().then((persistent) => {

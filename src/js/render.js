@@ -1,3 +1,6 @@
+import { parseChordPro } from "./chorprointerpreter.js";
+import { titlePageCreator } from "./titlepagecreator.js"
+
 const url = new URL(window.location.href);
 const songName = url.searchParams.get('songname');
 const songBook = url.searchParams.get('songbook');
@@ -38,7 +41,7 @@ async function renderSongbook(songbookName){
 	}else{
 		document.title = songbook.title;
 		document.body.insertBefore(titlePageCreator(songbook.title, songbook.subtitle), document.body.firstChild);
-		for(song of songbook.songs){
+		for( let song of songbook.songs){
 			song = findSong(list, song.title, song.artist);
 			if(song.file === undefined){
 				alert("Píseň \"" + song.title + "\" neexistuje");
@@ -51,7 +54,7 @@ async function renderSongbook(songbookName){
 async function renderAll(){
 	let list = await fetch("data/list.json");
     list = await list.json();
-	for(song in list.songs){
+	for(let song in list.songs){
 		getSongByname(list[song].file, false);
 	}
 }
@@ -66,7 +69,7 @@ async function getSongByname(songName, setPageTitle){
 		console.log(e);
 		return;
 	}
-	song = (parseChordPro(chordPro));
+	let song = (parseChordPro(chordPro));
 
 	let html = ChordProRender(song);
 	document.getElementById("rendering-target").appendChild(html);
@@ -86,7 +89,7 @@ function ChordProRender(songRoot){
 	songHolder.setAttribute("data-title", songRoot.title);
 	songHolder.setAttribute("data-artist", songRoot.artist);
 
-	heading = document.createElement("h1");
+	let heading = document.createElement("h1");
 	heading.innerText = songRoot.title + " - " + songRoot.artist;
 	songHolder.appendChild(heading);
 
@@ -174,7 +177,7 @@ function ChordProRenderRecursiveIterator(node, htmlElement, stack, verseNumber, 
 					}
 					textOrChord = textOrChord.nextNode;
 				}
-				whitespace = document.createElement("span");
+				let whitespace = document.createElement("span");
 				whitespace.innerHTML = "&nbsp";
 				wordWrapper.appendChild(whitespace);
 				element.appendChild(wordWrapper);

@@ -1,3 +1,5 @@
+import { settings, reset_settings, save_settings } from "./settings.js";
+
 const p_template = document.createElement("p");
 const p_key = p_template.cloneNode(1);
 p_key.setAttribute("class", "key");
@@ -10,7 +12,7 @@ button_template.setAttribute("class", "setButton")
 button_template.innerText = "set"; 
 let id = 0;
 
-eventmanager.addEventListener("settingsloaded", renderSettings);
+renderSettings();
 
 async function renderSettings(){
     document.getElementById("reset").addEventListener("click", function(){reset_settings(); location.reload()});
@@ -20,7 +22,7 @@ async function renderSettings(){
 }
 
 function create_editfields(object, parent, translation){
-    for(key in object){
+    for(let key in object){
         let id_copy = id;
         let key_copy = key;
         let div = div_row_template.cloneNode(1);
