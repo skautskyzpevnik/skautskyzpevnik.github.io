@@ -13,6 +13,7 @@ class DownloadManager{
     #callbackArray = [];
     #errorCallbackArray = [];
     #progressCallbackArray = [];
+    #callbackObjects = [];
     isWorkerShared = false;
 
     constructor(notSharedEror = false){
@@ -33,6 +34,7 @@ class DownloadManager{
             this.#cacheDownloader.callbackArray = this.#callbackArray;
             this.#cacheDownloader.errorCallbackArray = this.#errorCallbackArray;
             this.#cacheDownloader.progressCallbackArray = this.#progressCallbackArray;
+            this.#cacheDownloader.callbackObjects = this.#callbackObjects;
             console.log("downloadManager worker register");
         }else{
             console.error("Web Workers api unavalible.");
@@ -42,9 +44,9 @@ class DownloadManager{
     #workerCallback(e){
         console.log(e);
         if(e.data.state == "done"){
-            this.progressCallbackArray[e.data.callback](e.data);
+            this.progressCallbackArray[e.data.callback](this.callbackObjects[e.data.callback], e.data);
         }else if(e.data.state == "failed"){
-            this.errorCallbackArray[e.data.callback](e.data);
+            this.errorCallbackArray[e.data.callback](this.callbackObjects[e.data.callback], e.data);
         }else{
             console.error("Unimplemented");
         }
@@ -53,8 +55,14 @@ class DownloadManager{
     /**
      * 
      * @param {string|Array} toDownload 
+     * @param {string} cacheName 
+     * @param {Object} data 
+     * @param {Function} callback 
+     * @param {Function} progressCallback 
+     * @param {Function} errorCallback 
+     * @returns 
      */
-    downloadToCache(toDownload, cacheName, callback = console.log, progressCallback = console.log, errorCallback = console.error){
+    downloadToCache(toDownload, cacheName, data, callback = console.log, progressCallback = console.log, errorCallback = console.error){
         if(typeof toDownload == "string"){
             toDownload = [toDownload];
         }
@@ -71,6 +79,7 @@ class DownloadManager{
         this.#callbackArray[id] = callback;
         this.#progressCallbackArray[id] = progressCallback;
         this.#errorCallbackArray[id] = errorCallback;
+        this.#callbackObjects[id] = data;
 
         msg.callback = id;
 

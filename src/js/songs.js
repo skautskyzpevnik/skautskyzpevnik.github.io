@@ -65,6 +65,15 @@ async function renderSongs() {
     });
 }
 
+async function downloadAllSongs(){
+    const result = await songList.search(undefined, undefined, false);
+    let songlist = [];
+    result.forEach(song => {
+        songlist.push(["../../data/" + song.file + ".chordpro"]);
+    });
+    downloadManagerInstance.downloadToCache(songlist, "songCache", undefined, console.log ,renderSongs);
+}
+
 document.getElementById("songname").value = "";
 document.getElementById("artist").value = "";
 
@@ -78,3 +87,4 @@ document.getElementById("offline").addEventListener("click", function(event){
 document.getElementById("artist").addEventListener("keyup", function(event){
     renderSongs();
 });
+document.getElementById("downloadAll").addEventListener("click", downloadAllSongs);

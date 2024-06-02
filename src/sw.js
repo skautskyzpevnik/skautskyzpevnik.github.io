@@ -99,16 +99,22 @@ self.addEventListener("install", event => {
     event.waitUntil(updateCache());
 });
 
-self.addEventListener('fetch', async function(event){
-    let url = new URL(event.request.url);
-    url.search = '';
-    url.fragment = '';
+self.addEventListener('fetch', event => {
+    event.respondWith((async function () {
+        let url = event.request.url.split("/");
+        url[url.length - 1] = encodeURIComponent(decodeURI(url[url.length - 1]));
+        url = url.join("/");
+        url = new URL(url);
+        url.search = '';
+        url.fragment = '';
+        let cleanRequest = new Request(url);
+        let cacheResult = await caches.match(cleanRequest);
 
-    let cleanRequest = new Request(url);
-
-    event.respondWith(
-        caches.match(cleanRequest).then((response) => {
-            return response || fetch(event.request);
-        })
-    );
+        if (cacheResult) {
+            return cacheResult;
+        } else {
+            return fetch(event.request);
+        }
+    })(),);
+    
 });
