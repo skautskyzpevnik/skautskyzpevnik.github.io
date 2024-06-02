@@ -1,4 +1,4 @@
-import { extractFilenameFromURL } from "./utils.js";
+import { extractFilenameFromURL, fetchWrapper} from "./utils.js";
 
 class SonglistSong{
     title;
@@ -12,14 +12,22 @@ class Songlist{
     constructor(){
     }
     async #prepare(){
-        if(this.#songList.length == 0){
-            let list = await fetch("data/list.json");
-            list = await list.json();
+        if (this.#songList.length == 0) {
+            let list = localStorage.getItem("list");
+            try {
+                list = await fetchWrapper("data/list.json");
+                list = await list.text();
+            } catch {
+                console.warn("Offline using local songlist");
+            }
+            localStorage.setItem("list", list);
+            list = JSON.parse(list);
             let songList = list.songs;
             for(let song in songList){
                 song = songList[song];
                 this.#songList.push(song);
             };
+            this.#syncOffline();
             await this.#offline(this.#songList);
             
             this.#songBooks = list.songbooks;
@@ -183,6 +191,25 @@ class Songlist{
             }
         }
         return offlineSongs;
+    }
+    async #syncOffline() {
+        let cache = await caches.open("songCache");
+        let offlineSongsRequests = await cache.keys();
+        for (let request of offlineSongsRequests) {
+            let split = request.url.split("/");
+            let requestSongFile = split[split.length - 2] + "%2F" + extractFilenameFromURL(request.url);
+            let found = false;
+            for (let song of this.#songList) {
+                let encoded = encodeURIComponent(decodeURIComponent(song.file));
+                if(requestSongFile == encoded){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                cache.delete(request);
+            }
+        }
     }
 }
 

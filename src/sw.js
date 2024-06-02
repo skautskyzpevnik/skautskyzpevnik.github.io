@@ -113,7 +113,15 @@ self.addEventListener('fetch', event => {
         if (cacheResult) {
             return cacheResult;
         } else {
-            return fetch(event.request);
+            try {
+                return await fetch(event.request);
+            } catch (error) {
+                console.error('Fetch failed.', error);
+                return new Response('Network error occurred.', {
+                    status: 503,
+                    statusText: 'Service Unavailable'
+                });
+            }
         }
     })(),);
     

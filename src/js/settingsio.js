@@ -1,4 +1,5 @@
 import { settings, reset_settings, save_settings } from "./settings.js";
+import { fetchWrapper } from "./utils.js";
 
 const p_template = document.createElement("p");
 const p_key = p_template.cloneNode(1);
@@ -16,7 +17,7 @@ renderSettings();
 
 async function renderSettings(){
     document.getElementById("reset").addEventListener("click", function(){reset_settings(); location.reload()});
-    let translation = await fetch(prefix + "settings/translation.json");
+    let translation = await fetchWrapper(prefix + "settings/translation.json");
     translation = await translation.json();
     create_editfields(settings,document.getElementById("settings"), translation)
 }

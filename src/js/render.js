@@ -1,5 +1,6 @@
 import { parseChordPro } from "./chorprointerpreter.js";
 import { titlePageCreator } from "./titlepagecreator.js"
+import { fetchWrapper } from "./utils.js";
 
 const url = new URL(window.location.href);
 const songName = url.searchParams.get('songname');
@@ -26,12 +27,12 @@ function findSong(list, title, artist){
 }
 
 async function renderSongbook(songbookName){
-	let list = await fetch("data/list.json");
+	let list = await fetchWrapper("data/list.json");
     list = await list.json();
 	let songbook = undefined;
 	for( let testSongBook of list.songbooks){
 		if(songbookName == testSongBook.file){
-			songbook = await fetch("data/" + testSongBook.file);
+			songbook = await fetchWrapper("data/" + testSongBook.file);
 			songbook = await songbook.json();
 			break;
 		}
@@ -52,7 +53,7 @@ async function renderSongbook(songbookName){
 }
 
 async function renderAll(){
-	let list = await fetch("data/list.json");
+	let list = await fetchWrapper("data/list.json");
     list = await list.json();
 	for(let song in list.songs){
 		getSongByname(list[song].file, false);
@@ -62,7 +63,7 @@ async function renderAll(){
 async function getSongByname(songName, setPageTitle){
 	let chordPro = undefined;
 	try{
-		chordPro = await fetch("data/"+songName+".chordpro");
+		chordPro = await fetchWrapper("data/"+songName+".chordpro");
 		chordPro = await chordPro.text();
 	}catch(e){
 		alert("Song was not found.")

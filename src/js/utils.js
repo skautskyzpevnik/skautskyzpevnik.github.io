@@ -24,3 +24,13 @@ export function getParentByClass(node, cssClass){
     }
     return returnNode;
 }
+
+export async function fetchWrapper(url) {
+    let result = await fetch(url);
+    if (!result.ok || result.status != 200) {
+        console.error("Fetch responded with:");
+        console.error(result);
+        throw new Error("fetch error");
+    }
+    return result;
+}
