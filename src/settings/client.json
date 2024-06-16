@@ -1,5 +1,5 @@
 {
-    "version": 0.3,
+    "version": 0.4,
     "resources":[
         "",
         "index.html",
@@ -26,10 +26,8 @@
         "css/index.css",
         "css/songbook.css",
         "css/titlepage.css",
-        "js/render.js",
         "js/bg.js",
         "js/search.js",
-        "js/chorprointerpreter.js",
         "js/template.js",
         "js/settings.js",
         "js/settingsio.js",
@@ -40,6 +38,12 @@
         "js/downloadManager/index.js",
         "js/downloadManager/utils.js",
         "js/downloadManager/worker.js",
+        "js/render/chordpro/ast.js",
+        "js/render/chordpro/directives.js",
+        "js/render/chordpro/helper.js",
+        "js/render/chordpro/lexer.js",
+        "js/render/chordpro/parser.js",
+        "js/render/chordpro/index.js",
         "settings/translation.json"
     ]
 }
