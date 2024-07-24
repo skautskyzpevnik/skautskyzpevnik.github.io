@@ -1,53 +1,65 @@
-.linewrapper > p{
+.flex-container{
+    display: flex;
+}
+
+.flex-filler{
+    flex-grow: 1;
+}
+
+#content .linewrapper > p{
     margin: 0;
 }
 
-#rendering-target{
+#content #rendering-target{
     background-image: url("../img/render.png");
     background-repeat: repeat-y;
     background-size: 21cm 31.35cm;
 }
 
-h1{
+#content h1{
     text-decoration: underline;
     color: #18df18;
     text-shadow: 0.25mm 0.25mm black;
 }
 
-#rendering-target .lyric_block .line {
+#content #rendering-target .lyric_block .line {
     -webkit-column-break-inside: avoid; /* Chrome, Safari */
     page-break-inside: avoid;           /* Theoretically FF 20+ */
     break-inside: avoid-column;         /* IE 11 */
     display:table;                      /* Actually FF 20+ */
 }
-.chord {
+#content .chord {
     color: #44f;
     font-weight: bold;
     display: block;
     width: fit-content;
 }
 
-.chordLyricsWrapper{
+#content .chordLyricsWrapper{
     display: inline-block;
     width: fit-content;
 }
 
-p{
+#content p{
     margin-top: 0rem;
 }
 
 @media print {
-    #rendering-target {
+    #content #rendering-target {
         padding: 0;
         border: none;
     }
-    body{
+    #content{
         width: 21cm;
         height: 29.7cm;
+        top: 0;
         /*margin: 30mm 45mm 30mm 45mm;*/
     }
-    .songholder{
+    #content .songholder{
         page-break-after: always;
+    }
+    #toolbar{
+        display: none;
     }
 }
 @media screen {
@@ -57,6 +69,10 @@ p{
         justify-content: center;
     }
     body{
+        width: 100%;
+        margin: 0rem;
+    }
+    #content {
         background-color: white;
         width: 21cm;
         min-height: 29.7cm;
@@ -64,43 +80,81 @@ p{
         background-position-x: 30mm;
         padding: 30mm 45mm 30mm 45mm;
     }
+    #toolbar{
+        position: sticky;
+        top: 0rem;
+        display: flex;
+        padding: 1rem;
+        background-color: rgb(219, 219, 219);
+    }
+
+    #toolbar .icon{
+        cursor: pointer;
+    }
+    #toolbar .active{
+        background-color: rgb(91, 91, 91);
+        color: white;
+    }
+    #toolbar .icon:hover{
+        background-color: rgb(174, 174, 174);
+        color: white;
+    }
+
+    #toolbar .icon img{
+        height: 4rem;
+    }
+    #toolbar .icon .descr{
+        text-align: center;
+    }
+
+    #toolbar .icon .key{
+        text-align: center;
+        font-size: x-small;
+    }
+
+    #toolbar input[type="file"] {
+        height: 0rem;
+        width: 0rem;
+    }
+    #toolbar label{
+        display: inline-block;
+    }
+    #content .chord{
+        min-width: 30px;
+    }
 }
 
 @media screen and (max-width: 21cm) {
-    body{
+    #content{
         padding: 1rem;
         width: auto;
     }
 }
 
-.verse, .chorus{
+#content .verse, #content .chorus{
     display: flex;
     flex-direction: row;
     margin-top: 2rem;
 }
 
-/* .verseContent, .verseName{
-    display: inline-block;
-} */
-
-.verseName, .chorusName{
+#content .verseName, #content .chorusName{
     margin-right: 0.5rem;
 }
 
-.wordWrapper{
+#content .wordWrapper{
     display: inline-block;
     white-space: nowrap;
 }
 
-.titlepageholder{
+#content .titlepageholder{
     height: 29.7cm;
     page-break-after: always;
 }
 
-.titlepageholder h2{
+#content .titlepageholder h2{
     font-size: 5rem;
 }
 
-.titlepageholder h1{
+#content .titlepageholder h1{
     font-size: 10rem;
 }

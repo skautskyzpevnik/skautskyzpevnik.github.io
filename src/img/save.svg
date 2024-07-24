@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50mm"
+   height="50mm"
+   viewBox="0 0 50 50"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="printer.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.5643378"
+     inkscape:cx="-178.66984"
+     inkscape:cy="106.43481"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect5624"
+       style="opacity:1;fill:#c8c8c8;fill-opacity:1;stroke:#c7c7c7;stroke-width:0.110295;stroke-linejoin:bevel;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+       d="M 11.725382 10.948169 L 11.725382 42.451672 L 37.846785 42.451672 L 37.846785 17.654736 L 31.715377 10.948169 L 29.364099 10.948169 L 29.364099 17.823201 L 14.88643 17.823201 L 14.88643 10.948169 L 11.725382 10.948169 z M 14.909684 28.005526 L 34.603056 28.005526 L 34.603056 38.190951 L 14.909684 38.190951 L 14.909684 28.005526 z " />
+    <rect
+       style="opacity:1;fill:#c8c8c8;fill-opacity:1;stroke:#c7c7c7;stroke-width:0.1;stroke-linejoin:bevel;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect8649"
+       width="2.989902"
+       height="5.7406116"
+       x="24.517195"
+       y="10.943041" />
+  </g>
+</svg>

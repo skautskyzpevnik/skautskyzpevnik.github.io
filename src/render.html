@@ -6,10 +6,48 @@
     <meta name="theme-color" content="black"/>
     <title>Render</title>
     <script src="js/render/index.js" type="module" defer></script>
+    <script src="js/render/toolbar.js" type="module" defer></script>
+    <script src="js/selectionChange.js" type="module" defer></script>
     <link rel="stylesheet" href="css/render.css"/>
     <link href="css/titlepage.css" rel="stylesheet">
 </head>
     <body>
-        <div id="rendering-target"></div>
+        <div id="toolbar">
+            <div id="save" class="icon">
+                <img src="./img/save.svg"/>
+                <div class="descr">save</div>
+                <div class="key">(Ctrl + S)</div>
+            </div>
+            <div id="open" class="icon">
+                <label for="fileInput">
+                    <img src="./img/open.svg"/>
+                    <div class="descr">open</div>
+                    <div class="key">(Ctrl + O)</div>
+                </label>
+                <input type="file" id="fileInput">
+            </div>
+            <div id="print" class="icon">
+                <img src="./img/printer.svg"/>
+                <div class="descr">print</div>
+                <div class="key">(Ctrl + P)</div>
+            </div>
+            <div id="edit" class="icon">
+                <img src="./img/edit.svg"/>
+                <div class="descr">edit</div>
+                <div class="key">(Ctrl + E)</div>
+            </div>
+            <div id="chord" class="icon">
+                <img src="./img/chord.svg"/>
+                <div class="descr">chord</div>
+                <div class="key">(Alt + c)</div>
+            </div>
+        </div>
+        <div class="flex-container">
+            <div class="flex-filler"></div>
+            <div id="content">
+                <div id="rendering-target"></div>
+            </div>
+            <div class="flex-filler"></div>
+        </div>
     </body>
 </html>

@@ -21,8 +21,8 @@ for the JavaScript code in this page.
 */
 
 const swSettings = {
-    "version": 0.3,
-    "ExpectedCacheVersion": 0.4,
+    "version": 0.4,
+    "ExpectedCacheVersion": 0.5,
     "cacheName": "zpevnik",
     "cacheFile": "settings/client.json" 
 }

@@ -1,5 +1,5 @@
 {
-    "version": 0.4,
+    "version": 0.5,
     "resources":[
         "",
         "index.html",
@@ -35,6 +35,7 @@
         "js/songs.js",
         "js/titlepagecreator.js",
         "js/utils.js",
+        "js/selectionChange.js",
         "js/downloadManager/index.js",
         "js/downloadManager/utils.js",
         "js/downloadManager/worker.js",
@@ -43,7 +44,17 @@
         "js/render/chordpro/helper.js",
         "js/render/chordpro/lexer.js",
         "js/render/chordpro/parser.js",
+        "js/render/chordpro/utils.js",
+        "js/render/chordpro/globals.js",
+        "js/render/chordpro/observer.js",
+        "js/utils.js",
+        "js/render/toolbar.js",
         "js/render/index.js",
-        "settings/translation.json"
+        "settings/translation.json",
+        "img/chord.svg",
+        "img/edit.svg",
+        "img/open.svg",
+        "img/printer.svg",
+        "img/save.svg"
     ]
 }

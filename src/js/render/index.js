@@ -1,8 +1,9 @@
 import { fetchWrapper } from "../utils.js";
 import { parse } from "./chordpro/parser.js"
-import { titlePageCreator } from "../titlepagecreator.js"
-import { Songbook } from "./chordpro/ast.js"
+import { Songbook, SyntaxTreeLeafNode } from "./chordpro/ast.js"
 
+/**@type {SyntaxTreeLeafNode|undefined} */
+export let currentSongBook = undefined;
 const url = new URL(window.location.href);
 const songName = url.searchParams.get('songname');
 const songBook = url.searchParams.get('songbook');
@@ -16,8 +17,16 @@ if(songBook === "all"){
 }
 
 async function lonelySong(songName) {
+	let startTime = Date.now();
 	let ast = await getSongByName(songName);
-	console.log(ast);
+	console.log("Parsed song in " + (Date.now() - startTime) + " ms.");
+	renderFromSongbook(ast);
+}
+
+export async function lonelySongFromUrl(url, filename) {
+	let startTime = Date.now();
+	let ast = await getSongByUrl(filename, new Songbook(), url);
+	console.log("Parsed song in " + (Date.now() - startTime) + " ms.");
 	renderFromSongbook(ast);
 }
 
@@ -57,14 +66,14 @@ async function renderSongbook(songbookName) {
 			}
 		}
 	}
-	const ast = await loadSongsFromArray(songs, songbook.title, songbook.subtitle);
+	let ast = await loadSongsFromArray(songs, songbook.title, songbook.subtitle, songbookName);
 	renderFromSongbook(ast);
 }
 
 async function renderAll() {
 	let list = await fetchWrapper("data/list.json");
 	list = await list.json();
-	const ast = await loadSongsFromArray(Object.values(list.songs), "Vše", "Skautský zpěvník");
+	let ast = await loadSongsFromArray(Object.values(list.songs), "Vše", "Skautský zpěvník", "all");
 	renderFromSongbook(ast);
 }
 
@@ -73,9 +82,10 @@ async function renderAll() {
  * @param {Array} songArray 
  * @returns 
  */
-async function loadSongsFromArray(songArray, title = "", subtitle = "") {
+async function loadSongsFromArray(songArray, title = "", subtitle = "", filename = undefined) {
 	let startTime = Date.now();
 	const songBook = new Songbook();
+	songBook.filename = filename;
 	songBook.title = title;
 	songBook.subtitle = subtitle;
 	for (let song of songArray) {
@@ -93,21 +103,45 @@ async function loadSongsFromArray(songArray, title = "", subtitle = "") {
 	return songBook;
 }
 
-async function getSongByName(songName, songBook = new Songbook()){
+/**
+ * 
+ * @param {string} songName 
+ * @param {Songbook} songBook 
+ * @returns 
+ */
+async function getSongByName(songName, songBook = new Songbook()) {
+	return await getSongByUrl(songName, songBook, "data/" + songName + ".chordpro");
+}
+
+/**
+ * 
+ * @param {string} songName 
+ * @param {Songbook} songBook 
+ * @returns 
+ */
+async function getSongByUrl(songName, songBook = new Songbook(), url){
 	let chordPro = undefined;
 	try{
-		chordPro = await fetchWrapper("data/"+songName+".chordpro");
+		chordPro = await fetchWrapper(url);
 		chordPro = await chordPro.text();
 	}catch(e){
 		alert("Song was not found.")
 		console.log(e);
 		return;
 	}
-	return parse(chordPro, songBook);
+	let name = songName.split("/");
+	name = name[name.length - 1]
+	return parse(chordPro, songBook, name);
 }
 
+/**
+ * 
+ * @param {Songbook} songBook 
+ */
 async function renderFromSongbook(songBook) {
+	currentSongBook = songBook;
 	let startTime = Date.now();
 	document.getElementById("rendering-target").appendChild(songBook.html);
 	console.log("Render time " + (Date.now() - startTime) + " ms.");
 }
+

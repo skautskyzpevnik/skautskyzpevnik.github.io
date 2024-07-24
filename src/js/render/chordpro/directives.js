@@ -1,4 +1,11 @@
 import { Directive, MetaDirective, DirectiveChildren, Song, SyntaxTreeNode } from "./ast.js"
+import { getAbove } from "./utils.js"
+
+export class SemanticsError extends Error {
+    constructor(message, lineNumber, charNumber) {
+        super("Semantics error: " + message + "\n on line: " + lineNumber + " char: " + charNumber)
+    }
+}
 
 function createChordProName(name){
 	let span = document.createElement("span");
@@ -52,10 +59,23 @@ export class Soc extends DirectiveChildren {
     static directiveClosingShortcut = "eoc";
     static automaticSov = false;
     name = "R";
+    generated = true;
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super(line, charNumber, unnamedArgument, namedArguments);
-        if (unnamedArgument !== "") {
+        if (unnamedArgument !== ""&& unnamedArgument !== undefined) {
             this.name = unnamedArgument;
+            this.generated = false;
+        }
+    }
+
+    setParent(node) {
+        super.setParent(node);
+        let song = getAbove(Song, this);
+        if (song !== undefined) {
+            song.chorusIndex[this.name] = this;
+            song.lastChorus = this;
+        } else {
+            console.warn("Broken tree!")
         }
     }
 
@@ -73,6 +93,20 @@ export class Soc extends DirectiveChildren {
         element.appendChild(paragraph);
         return element;
     }
+    get chordpro() {
+        let text = "";
+        if (this.generated) {
+            text += "\n\n{" + this.constructor.directiveName + "}";
+        } else {
+            text += "\n\n{" + this.constructor.directiveName + ": " + this.name + "}";
+        }
+        
+        for (let child of this.children) {
+            text += child.chordpro;
+        }
+        text += "\n{" + this.constructor.directiveClosingName + "}";
+        return text;
+    }
 }
 
 export class Sov extends DirectiveChildren {
@@ -82,17 +116,24 @@ export class Sov extends DirectiveChildren {
     static directiveClosingShortcut = "eov";
     static automaticSov = false;
     name = "";
+    generated = true;
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super(line, charNumber, unnamedArgument, namedArguments);
-        if (unnamedArgument !== "") {
+        if (unnamedArgument !== "" && unnamedArgument !== undefined) {
             this.name = unnamedArgument;
+            this.generated = false;
         }
     }
 
     get html() {
         const element = document.createElement("div");
         element.setAttribute("class", "verse");
-        element.appendChild(createChordProName(this.name + ":"));
+        if (this.name !== "") {
+            element.appendChild(createChordProName(this.name + ":"));
+        } else {
+            element.appendChild(createChordProName(this.name));
+        }
+        
         const paragraph = document.createElement("p");
         paragraph.setAttribute("class", "verseContent");
 
@@ -103,18 +144,61 @@ export class Sov extends DirectiveChildren {
         element.appendChild(paragraph);
         return element;
     }
+    get chordpro() {
+        let text = "";
+        if (this.generated) {
+            text += "\n";
+        } else {
+            text += "\n{" + this.constructor.directiveName + ": " + this.name + "}";
+        }
+
+        for (let child of this.children) {
+            text += child.chordpro;
+        }
+        if (!this.generated) {
+            text += "\n{" + this.constructor.directiveClosingName + "}\n";   
+        }
+        return text;
+    }
 }
 
 export class Chorus extends Directive {
+    #linked = undefined;
     static directiveName = "chorus";
     static directiveShortcut = undefined;
+    name = "";
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super(line, charNumber, unnamedArgument, namedArguments);
         this.name = unnamedArgument;
     }
     get html() {
         const element = document.createElement("div");
+        element.setAttribute("class", "choruslink");
+        let song = getAbove(Song, this);
+        if (song !== undefined) {
+            if (this.name !== "") {
+                this.#linked = song.chorusIndex[this.name];
+            } else {
+                this.#linked = song.lastChorus;
+            }
+            if (this.#linked === undefined) {
+                throw new SemanticsError("Unknown chorus", this.line, this.charNumber);
+            } else {
+                element.innerText = this.#linked.name;
+            }
+        } else {
+            console.warn("Broken tree!")
+        }
         return element;
+    }
+    get chordpro() {
+        let text = "";
+        if (this.#linked !== undefined && this.#linked.name !== undefined) {
+            text = "\n\n{" + this.constructor.directiveName + ": " + this.#linked.name +   "}";
+        } else {
+            text = "\n\n{" + this.constructor.directiveName + "}";
+        }
+        return text;
     }
 }
 

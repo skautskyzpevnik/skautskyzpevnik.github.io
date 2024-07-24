@@ -2,6 +2,7 @@ import {tokenizer, Token, OpeningCurlyBrace, ClosingCurlyBrace, Colon, OpeningSq
 import { InternalError } from "./helper.js"
 import { Soc, Sov, directiveSearch } from "./directives.js"
 import { Songbook, Song, MetaDirective, DirectiveChildren, Chord, SyntaxTreeNode, Directive, Text, Line } from "./ast.js"
+import { getAbove } from "./utils.js"
 
 export class SyntaxError extends Error {
     constructor(message, lineNumber, charNumber) {
@@ -133,22 +134,6 @@ function getClosingFromClass(classInstance, active, warn) {
 }
 
 /**
- * 
- * @param {Class} classInstance 
- * @param {SyntaxTreeNode} active 
- */
-function getAbove(classInstance, active) {
-    let activeNode = active;
-    do {
-        if (activeNode instanceof classInstance) {
-            return activeNode;
-        }
-        activeNode = activeNode.parent;
-    } while (activeNode !== undefined);
-    return false;
-}
-
-/**
  * Returns chord text
  * @param {number} i 
  * @param {Token[]} tokens 
@@ -173,10 +158,11 @@ function exportChord(i, tokens) {
  * @param {Songbook} songBook songbook to append the song/songs to
  * @returns {Songbook}
  */
-export function parse(text, songBook = new Songbook()) {
+export function parse(text, songBook = new Songbook(), filename = undefined) {
     const tokens = tokenizer(text);
     const root = songBook;
     let activeNode = new Song();
+    activeNode.filename = filename;
     root.appendChild(activeNode);
     let numberSpace = 0;
     let readNewline = true;

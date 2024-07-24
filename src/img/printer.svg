@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50mm"
+   height="50mm"
+   viewBox="0 0 50 50"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="printer.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.2123078"
+     inkscape:cx="162.95201"
+     inkscape:cy="88.369259"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect234"
+       style="fill:#c9c9c9;fill-opacity:1;stroke:none;stroke-width:0.675121;stroke-linejoin:bevel;stroke-opacity:1;paint-order:stroke fill markers"
+       d="m 9.10177,16.543722 v 22.642546 h 9.50305 l 0.03719,-4.638112 17.002945,-0.0026 0.04228,4.682959 8.150431,-0.04229 V 16.543722 Z"
+       sodipodi:nodetypes="ccccccccc" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#c7c7c7;stroke-width:0.1;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect1834"
+       width="17.180643"
+       height="9.5513086"
+       x="18.553755"
+       y="34.52076"
+       ry="0" />
+    <rect
+       style="fill:#8a8a8a;fill-opacity:1;stroke:none;stroke-width:0.453433;stroke-linejoin:bevel;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect1836"
+       width="23.963652"
+       height="6.3736725"
+       x="15.079677"
+       y="10.343914"
+       ry="0" />
+  </g>
+</svg>
