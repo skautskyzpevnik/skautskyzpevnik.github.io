@@ -1,13 +1,17 @@
 import { titlePageCreator } from "../../titlepagecreator.js"
 import { linkToHtmlAttribute } from "./observer.js";
 import { glob, uniqueNumber } from "./globals.js";
-
-import { currentSongBook } from "../index.js";
 import { rangeInsideElement } from "./utils.js";
+import { InternalError } from "./helper.js";
+import { Soc } from "./directives.js";
 
+/**
+ * Abstract class representing any ast node
+ */
 export class SyntaxTreeNode{
     line = 0;
     charNumber = 0;
+    /**@type {SyntaxTreeNode|undefined} */
     parent = undefined;
     uniqueId = 0;
 
@@ -15,6 +19,11 @@ export class SyntaxTreeNode{
         this.uniqueId = String(uniqueNumber());
     }
 
+    /**
+     * Returns node with specific id
+     * @param {string} id 
+     * @returns {SyntaxTreeNode|undefined} 
+     */
     getNodeById(id) {
         if (this.uniqueId === id) {
             return this;
@@ -23,9 +32,20 @@ export class SyntaxTreeNode{
         }
     }
 
+    /**
+     * Helper function that sets parent node
+     * SHOULD be called only by its parent 
+     * @param {SyntaxTreeNode|undefined} node 
+     */
     setParent(node) {
         this.parent = node;
     }
+
+    /**
+     * Gets the closest (up) node that is instance of class
+     * @param {Class} getClass 
+     * @returns {SyntaxTreeNode|undefined}
+     */
     getClassNode(getClass) {
         if (this instanceof getClass) {
             return this;            
@@ -35,21 +55,42 @@ export class SyntaxTreeNode{
             return this.parent.getClassNode(getClass);
         }
     }
+
+    /**
+     * Debug function 
+     * @returns {Object}
+     */
     toJSON() {
         const { parent, ...rest } = this;
         return rest;
     }
 }
 
+/**
+ * Abstract class representing specific type of leaf nodes of ast (like Chord or Text)
+ */
 export class SyntaxTreeLeafNode extends SyntaxTreeNode{
+    /**@type {htmlElement[]|undefined} */
     htmlElement = undefined;
+    /**@type {Range} */
     lastRange = undefined;
+    /**
+     * 
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     */
     constructor(line, charNumber) {
         super();
         this.line = line;
         this.charNumber = charNumber;
     }
 
+    /**
+     * Sets selection inside this node
+     * @param {number} start 
+     * @param {number} stop 
+     * @param {boolean} collapse 
+     */
     setSelection(start, stop, collapse) {
         if (this.htmlElement !== undefined) {
             const range = document.createRange();
@@ -63,6 +104,10 @@ export class SyntaxTreeLeafNode extends SyntaxTreeNode{
         }
     }
 
+    /**
+     * Gets selection from this node 
+     * @returns 
+     */
     getSelection() {
         let start = 0;
         let stop = 0;
@@ -86,6 +131,10 @@ export class SyntaxTreeLeafNode extends SyntaxTreeNode{
         };
     }
 
+    /**
+     * Tests if this node has focus
+     * @returns 
+     */
     hasFocus() {
         if (this.htmlElement !== undefined) {
             return this.htmlElement === document.activeElement;
@@ -93,21 +142,33 @@ export class SyntaxTreeLeafNode extends SyntaxTreeNode{
             return false;
         }
     }
+    /**
+     * Fires on focus event on this node
+     * @param {Event} event 
+     */
     onFocus(event) {
         glob.activeAstNode = this;
     }
-
+    /**
+     * Fires on leave event on this node
+     * @param {Event} event 
+     */
     onLeave(event) { }
+    /**
+     * Fires on edit event on this node
+     * @param {Event} event 
+     */
     onEdit(event) { }
+    /**
+     * Fires on SelectionChange event on this node (using custom bobbling event)
+     * @param {Event} event 
+     */
     onSelectionChange(event) {
         if (this.htmlElement !== undefined) {
             this.lastRange = rangeInsideElement(event.detail.range, this.htmlElement);
         }
     }
 
-    /**
-     * @param {HTMLElement} htmlElement
-     */
     get html() {
         if (this.htmlElement !== undefined) {
             this.htmlElement.setAttribute("data-astid", this.uniqueId);
@@ -121,22 +182,35 @@ export class SyntaxTreeLeafNode extends SyntaxTreeNode{
     }
 }
 
+/**
+ * Abstract class representing node of ast that cane have child nodes
+ */
 export class SyntaxTreeNodeWithChildren extends SyntaxTreeNode{
+    /**@type {htmlElement[]|undefined} */
     htmlElement = undefined;
 
-     /**
+    /**
      * Children of this node
      * @type {SyntaxTreeNode[]}
      */
-     children = [];
+    children = [];
 
-
+    /**
+     * 
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     */
     constructor(line, charNumber) {
         super();
         this.line = line;
         this.charNumber = charNumber;
     }
 
+    /**
+     * Returns node with specific id
+     * @param {string} id 
+     * @returns {SyntaxTreeNode|undefined} 
+     */
     getNodeById(id) {
         if (this.uniqueId === id) {
             return this;
@@ -151,6 +225,11 @@ export class SyntaxTreeNodeWithChildren extends SyntaxTreeNode{
         }
     }
 
+    /**
+     * Inserts node after reference node
+     * @param {SyntaxTreeNode} newNode 
+     * @param {SyntaxTreeNode} referenceNode child of this node 
+     */
     insertAfter(newNode, referenceNode) {
         if (!(newNode instanceof SyntaxTreeNode)) {
             throw new InternalError("Attempted to add child of unsupported type.");
@@ -162,6 +241,11 @@ export class SyntaxTreeNodeWithChildren extends SyntaxTreeNode{
         }    
     }
 
+    /**
+     * Inserts node before reference node
+     * @param {SyntaxTreeNode} newNode 
+     * @param {SyntaxTreeNode} referenceNode child of this node 
+     */
     insertBefore(newNode, referenceNode) {
         if (!(newNode instanceof SyntaxTreeNode)) {
             throw new InternalError("Attempted to add child of unsupported type.");
@@ -173,6 +257,12 @@ export class SyntaxTreeNodeWithChildren extends SyntaxTreeNode{
         }
     }
 
+    /**
+     * Returns node after passed node
+     * @param {SyntaxTreeNode} node 
+     * @returns {SyntaxTreeNode|undefined}
+     * @throws {InternalError} if child is of unsupported type
+     */
     nextNode(node) {
         if (!(node instanceof SyntaxTreeNode)) {
             throw new InternalError("Attempted to add child of unsupported type.");
@@ -185,6 +275,13 @@ export class SyntaxTreeNodeWithChildren extends SyntaxTreeNode{
             return undefined;
         }
     }
+
+    /**
+     * Returns node previous passed node
+     * @param {SyntaxTreeNode} node 
+     * @returns {SyntaxTreeNode|undefined}
+     * @throws {InternalError} if child is of unsupported type
+     */
     previousNode(node) {
         if (!(node instanceof SyntaxTreeNode)) {
             throw new InternalError("Attempted to add child of unsupported type.");
@@ -198,10 +295,17 @@ export class SyntaxTreeNodeWithChildren extends SyntaxTreeNode{
         }
     }
     
+    /**
+     * Rearranges internal structure
+     */
     rearrange() {
         
     }
 
+    /**
+     * Removes child
+     * @param {SyntaxTreeNode} child 
+     */
     removeChild(child) {
         let index  = this.children.indexOf(child);
         if (index > -1) {
@@ -210,6 +314,10 @@ export class SyntaxTreeNodeWithChildren extends SyntaxTreeNode{
         this.rearrange();
     }
 
+    /**
+     * Appends node as last children
+     * @param {SyntaxTreeNode} child 
+     */
     appendChild(child) {
         if (!(child instanceof SyntaxTreeNode)) {
             throw new InternalError("Attempted to add child of unsupported type.");
@@ -219,9 +327,13 @@ export class SyntaxTreeNodeWithChildren extends SyntaxTreeNode{
     }
 }
 
+/**
+ * Class implementing songbook ast node
+ */
 export class Songbook extends SyntaxTreeNodeWithChildren{
     title = "";
     subtitle = "";
+    /**@type {string|undefined} */
     filename = undefined;
     get html() {
         let element = document.createElement("div");
@@ -249,11 +361,17 @@ export class Songbook extends SyntaxTreeNodeWithChildren{
     }
 }
 
+/**
+ * Class implementing song ast node
+*/
 export class Song extends SyntaxTreeNodeWithChildren{
     title = "";
     artist = "";
+    /**@type {string|undefined} */
     filename = undefined;
+    /**@type {Soc[]|undefined} */
     chorusIndex = {}
+    /**@type {Soc|undefined} */
     lastChorus = undefined;
     get html() {
         let element = document.createElement("div");
@@ -286,9 +404,19 @@ export class Song extends SyntaxTreeNodeWithChildren{
     }
 }
 
+/**
+ * Class implementing text ast node
+ */
 export class Text extends SyntaxTreeLeafNode{
     #innerText = "";
+    /**@type {htmlElement[]|undefined} */
     htmlElement = undefined;
+    /**
+     * 
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     * @param {string} innerText inner text 
+     */
     constructor(line, charNumber, innerText) {
         super(line, charNumber);
         this.#innerText = innerText;
@@ -305,12 +433,16 @@ export class Text extends SyntaxTreeLeafNode{
         }
     }
 
+    /**
+     * Reacts to edit of html element corresponding to this node
+     * @param {Event} event 
+     */
     onEdit(event) {
         this.#innerText = event.target.innerText;
     }
 
     /**
-     * 
+     * Reacts to leave of html element corresponding to this node
      * @param {Event} event 
      */
     onLeave(event) {
@@ -321,6 +453,9 @@ export class Text extends SyntaxTreeLeafNode{
         }
     }
 
+    /**
+     * Creates chords from last range in this node
+     */
     chord() {
         if (this.lastRange !== undefined && glob.contentEditable) {
             const secondText = this.#innerText.slice(this.lastRange.stop);
@@ -335,6 +470,9 @@ export class Text extends SyntaxTreeLeafNode{
         }
     }
 
+    /**
+     * removes this node
+     */
     remove() {
         if (this.htmlElement !== undefined) {
             this.htmlElement.parentElement.removeChild(this.htmlElement);
@@ -361,9 +499,19 @@ export class Text extends SyntaxTreeLeafNode{
     }
 }
 
+/**
+ * Class implementing Chord ast node
+ */
 export class Chord extends SyntaxTreeLeafNode{
     #innerText = "";
+    /**@type {htmlElement[]|undefined} */
     htmlElement = undefined;
+    /**
+     * 
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     * @param {string} innerText inner text 
+     */
     constructor(line, charNumber, innerText) {
         super(line, charNumber);
         this.innerText = innerText;
@@ -380,10 +528,17 @@ export class Chord extends SyntaxTreeLeafNode{
         }
     }
 
+    /**
+     * Reacts to edit of html element corresponding to this node
+     * @param {Event} event 
+     */
     onEdit(event) {
         this.#innerText = event.target.innerText;
     }
 
+    /**
+     * Sets focus to htmlElement representing this node
+     */
     focus() {
         this.htmlElement.focus();
     }
@@ -414,12 +569,18 @@ export class Chord extends SyntaxTreeLeafNode{
     }
 }
 
+/**
+ * Class implementing Line ast node
+ */
 export class Line extends SyntaxTreeNodeWithChildren{
     innerText = "\n";
     constructor(line, charNumber) {
         super(line, charNumber);
     }
 
+    /**
+     * rearranges and merges childNodes
+     */
     rearrange() {
         let i = 0;
         while (i+1 < this.children.length) {
@@ -450,6 +611,9 @@ export class Line extends SyntaxTreeNodeWithChildren{
         }
     }
 
+    /**
+     * rerenders this node
+     */
     reRender() {
         if (this.htmlElement === undefined) {
             this.htmlElement = document.createElement("div");
@@ -495,36 +659,68 @@ export class Line extends SyntaxTreeNodeWithChildren{
  * It only affects metadata of some other node.
  */
 export class MetaDirective extends SyntaxTreeNode{
+    /**@type {string} */
     static directiveName;
+    /**@type {string} */
     static directiveShortcut;
     
+    /**
+     * Generate side effect of the directive
+     * @param {string} unnamedArgument 
+     * @param {string} namedArguments 
+     * @param {SyntaxTreeNode} activeNode 
+     */
     static generateSideEffects(unnamedArgument, namedArguments, activeNode) {
         
     }
 }
-
+/**
+ * Abstract class representing Directive ast node
+ */
 export class Directive extends SyntaxTreeNode{
+    /**@type {string} */
     static directiveName;
+    /**@type {string} */
     static directiveShortcut;
     
     line = 0;
     charNumber = 0
+    /**
+     * 
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     * @param {string} unnamedArgument unnamed argument
+     * @param {string[]} namedArguments list of named arguments
+     */
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super();
         this.line = line;
         this.charNumber = charNumber;
     }
 }
-
+/**
+ * Abstract class representing Directive that has children ast node
+ */
 export class DirectiveChildren extends SyntaxTreeNodeWithChildren{
+    /**@type {string} */
     static directiveName;
+    /**@type {string} */
     static directiveShortcut;
+    /**@type {string} */
     static directiveClosingName;
+    /**@type {string} */
     static directiveClosingShortcut;
     static automaticSov = true;
     
     line = 0;
     charNumber = 0
+    /**
+     * 
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     * @param {string} unnamedArgument unnamed argument
+     * @param {string[]} namedArguments list of named arguments
+     */
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super();
         this.line = line;

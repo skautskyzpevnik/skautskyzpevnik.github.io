@@ -41,26 +41,30 @@ class DownloadManager{
         }
     }
 
+    /**
+     * Handles messages from worker
+     * @param {MessageEvent} e 
+     */
     #workerCallback(e){
         console.log(e);
         if(e.data.state == "done"){
-            this.progressCallbackArray[e.data.callback](this.callbackObjects[e.data.callback], e.data);
+            this.#progressCallbackArray[e.data.callback](this.#callbackObjects[e.data.callback], e.data);
         }else if(e.data.state == "failed"){
-            this.errorCallbackArray[e.data.callback](this.callbackObjects[e.data.callback], e.data);
+            this.#errorCallbackArray[e.data.callback](this.#callbackObjects[e.data.callback], e.data);
         }else{
             console.error("Unimplemented");
         }
     }
     
     /**
-     * 
-     * @param {string|Array} toDownload 
+     * Adds resource to cache
+     * @param {string|string[]} toDownload Urls
      * @param {string} cacheName 
      * @param {Object} data 
      * @param {Function} callback 
      * @param {Function} progressCallback 
      * @param {Function} errorCallback 
-     * @returns 
+     * @returns {Boolean}
      */
     downloadToCache(toDownload, cacheName, data, callback = console.log, progressCallback = console.log, errorCallback = console.error){
         if(typeof toDownload == "string"){

@@ -9,10 +9,10 @@ export function extractFilenameFromURL(url){
 }
 
 /**
- * 
+ * Returns element that has specific class
  * @param {HTMLElement} node 
- * @param {*} cssClass 
- * @returns 
+ * @param {string} cssClass 
+ * @returns {HTMLElement|undefined}
  */
 export function getParentByClass(node, cssClass){
     let returnNode = undefined;
@@ -25,6 +25,11 @@ export function getParentByClass(node, cssClass){
     return returnNode;
 }
 
+/**
+ * Wrapper for fetch handles service worker errors
+ * @param {string} url 
+ * @returns 
+ */
 export async function fetchWrapper(url) {
     let result = await fetch(url);
     if (!result.ok || result.status != 200) {

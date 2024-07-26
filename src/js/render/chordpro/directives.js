@@ -1,24 +1,35 @@
 import { Directive, MetaDirective, DirectiveChildren, Song, SyntaxTreeNode } from "./ast.js"
 import { getAbove } from "./utils.js"
 
+/**
+ * Class representing semantics error in parser
+ */
 export class SemanticsError extends Error {
     constructor(message, lineNumber, charNumber) {
         super("Semantics error: " + message + "\n on line: " + lineNumber + " char: " + charNumber)
     }
 }
 
-function createChordProName(name){
+/**
+ * Create verse name html element
+ * @param {string} name 
+ * @returns {HTMLElement}
+ */
+function createVerseName(name){
 	let span = document.createElement("span");
 	span.innerText = name;
 	span.setAttribute("class", "verseName")
 	return span;
 }
 
+/**
+ * Class implementing Title meta directive
+ */
 export class Title extends MetaDirective{
     static directiveName = "title";
     static directiveShortcut = "t";
     /**
-     * 
+     * Generate side effect of the directive
      * @param {string} unnamedArgument 
      * @param {Array} namedArguments 
      * @param {SyntaxTreeNode} activeNode 
@@ -33,11 +44,14 @@ export class Title extends MetaDirective{
     }
 }
 
+/**
+ * Class implementing Artist meta directive
+ */
 export class Artist extends MetaDirective{
     static directiveName = "artist";
     static directiveShortcut = undefined;
     /**
-     * 
+     * Generate side effect of the directive
      * @param {string} unnamedArgument 
      * @param {Array} namedArguments 
      * @param {SyntaxTreeNode} activeNode 
@@ -52,6 +66,9 @@ export class Artist extends MetaDirective{
     }
 }
 
+/**
+ * Class implementing chorus node
+ */
 export class Soc extends DirectiveChildren {
     static directiveName = "start_of_chorus";
     static directiveShortcut = "soc";
@@ -60,6 +77,12 @@ export class Soc extends DirectiveChildren {
     static automaticSov = false;
     name = "R";
     generated = true;
+    /**
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     * @param {string} unnamedArgument 
+     * @param {Array} namedArguments
+     */
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super(line, charNumber, unnamedArgument, namedArguments);
         if (unnamedArgument !== ""&& unnamedArgument !== undefined) {
@@ -68,6 +91,11 @@ export class Soc extends DirectiveChildren {
         }
     }
 
+    /**
+     * Helper function that sets parent node
+     * SHOULD be called only by its parent 
+     * @param {SyntaxTreeNode|undefined} node 
+     */
     setParent(node) {
         super.setParent(node);
         let song = getAbove(Song, this);
@@ -82,7 +110,7 @@ export class Soc extends DirectiveChildren {
     get html() {
         const element = document.createElement("div");
         element.setAttribute("class", "chorus");
-        element.appendChild(createChordProName(this.name + ":"));
+        element.appendChild(createVerseName(this.name + ":"));
         const paragraph = document.createElement("p");
         paragraph.setAttribute("class", "chorusContent");
 
@@ -109,6 +137,9 @@ export class Soc extends DirectiveChildren {
     }
 }
 
+/**
+ * Class implementing verse node
+ */
 export class Sov extends DirectiveChildren {
     static directiveName = "start_of_verse";
     static directiveShortcut = "sov";
@@ -117,6 +148,12 @@ export class Sov extends DirectiveChildren {
     static automaticSov = false;
     name = "";
     generated = true;
+    /**
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     * @param {string} unnamedArgument 
+     * @param {Array} namedArguments
+     */
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super(line, charNumber, unnamedArgument, namedArguments);
         if (unnamedArgument !== "" && unnamedArgument !== undefined) {
@@ -129,9 +166,9 @@ export class Sov extends DirectiveChildren {
         const element = document.createElement("div");
         element.setAttribute("class", "verse");
         if (this.name !== "") {
-            element.appendChild(createChordProName(this.name + ":"));
+            element.appendChild(createVerseName(this.name + ":"));
         } else {
-            element.appendChild(createChordProName(this.name));
+            element.appendChild(createVerseName(this.name));
         }
         
         const paragraph = document.createElement("p");
@@ -162,11 +199,21 @@ export class Sov extends DirectiveChildren {
     }
 }
 
+/**
+ * Class implementing chorus link node
+ */
 export class Chorus extends Directive {
+    /**@type {Soc|undefined} */
     #linked = undefined;
     static directiveName = "chorus";
     static directiveShortcut = undefined;
     name = "";
+    /**
+     * @param {number} line line in source 
+     * @param {number} charNumber charnumber in line in source
+     * @param {string} unnamedArgument 
+     * @param {Array} namedArguments
+     */
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super(line, charNumber, unnamedArgument, namedArguments);
         this.name = unnamedArgument;
@@ -202,8 +249,14 @@ export class Chorus extends Directive {
     }
 }
 
+/** list of known directives */
 const directiveList = [Title, Artist, Soc, Sov, Chorus];
 
+/**
+ * Search and returns directive class
+ * @param {string} name 
+ * @returns {Class}
+ */
 export function directiveSearch(name) {
     if (name === undefined) {
         console.warn("undefined");

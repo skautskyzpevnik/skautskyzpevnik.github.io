@@ -1,4 +1,9 @@
-function postMessageWrapper(e, msg){
+/**
+ * Posts message back to main thread
+ * @param {MessageEvent} e 
+ * @param {Object} msg 
+ */
+function postMessageWrapper(e, msg) {
     if(e.ports[0] === undefined){
         postMessage(msg);
     }else{

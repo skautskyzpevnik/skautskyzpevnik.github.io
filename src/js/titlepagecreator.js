@@ -1,4 +1,12 @@
-export function titlePageCreator(title, subtitle, onclick=function(){}, url=undefined){
+/**
+ * Creates title page element representing songbook
+ * @param {string} title 
+ * @param {string} subtitle 
+ * @param {Function} onclick 
+ * @param {string} url 
+ * @returns {HTMLElement}
+ */
+export function titlePageCreator(title, subtitle, onclick = function () { }, url = undefined) {
     const titlePageHolder = document.createElement("div");
     titlePageHolder.setAttribute("class", "titlepageholder");
     titlePageHolder.setAttribute("data-url", url);

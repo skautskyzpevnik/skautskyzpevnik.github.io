@@ -7,23 +7,30 @@ import { Text } from "./chordpro/ast.js";
 const toolbar = document.getElementById("toolbar");
 
 /**
- * Show if button is active
+ * Sets button to active or inactive
  * @param {htmlElement} htmlElement 
- * @param {*} boolean 
+ * @param {boolean} active 
  */
-function show(htmlElement, boolean) {
-    if (boolean) {
+function show(htmlElement, active) {
+    if (active) {
         htmlElement.classList.add("active");
     } else {
         htmlElement.classList.remove("active");
     }
 }
 
+/**
+ * Switches ability to edit text
+ * @param {Event} event 
+ */
 function edit(event) {
     glob.contentEditable = !glob.contentEditable;
     show(editButton, glob.contentEditable);
 }
-
+/**
+ * Saves current songbook
+ * @param {Event} event 
+ */
 function save(event) {
     if (currentSongBook !== undefined) {
         let filename = "song";
@@ -35,13 +42,19 @@ function save(event) {
         download(filename + ".chordpro", currentSongBook.chordpro)
     }
 }
-
+/**
+ * Opens new file
+ * @param {Event} event 
+ */
 function open(event) {
     let file = event.target.files[0];
     document.getElementById("rendering-target").innerHTML = "";
     lonelySongFromUrl(URL.createObjectURL(file), file.name);
 }
-
+/**
+ * Adds new chord
+ * @param {Event} event 
+ */
 function chord(event) {
     resetRange(ranges);
     let container = getElementFromNode(ranges.commonAncestorContainer);
@@ -161,7 +174,11 @@ window.addEventListener('keyup', function (e) {
             break;
     }
 });
-
+/**
+ * Downloads string as file
+ * @param {string} filename 
+ * @param {string} text 
+ */
 function download(filename, text) {
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -186,7 +203,10 @@ document.addEventListener("customselectionchange", (event) => {
     activeElements.push(document.activeElement);
     ranges = window.getSelection().getRangeAt(0);
 });
-
+/**
+ * Sets active range
+ * @param {Range} range 
+ */
 function resetRange(range) {
     if (range !== undefined) {
         const select = window.getSelection();

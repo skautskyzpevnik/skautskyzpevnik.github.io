@@ -2,6 +2,7 @@ import { titlePageCreator } from "./titlepagecreator.js";
 import { songList } from "./search.js";
 import { getParentByClass } from "./utils.js";
 
+/** Renders Songbooks ui */
 async function loadSongBooks(){
     let sb = await songList.songBooks()
     sb.forEach(function(songBook){

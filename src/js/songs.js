@@ -2,7 +2,11 @@ import { songList } from "./search.js";
 import { getParentByClass } from "./utils.js";
 import { downloadManagerInstance } from "./downloadManager/index.js"
 
-
+/**
+ * Creates ui representing song
+ * @param {Object} song 
+ * @returns {HTMLElement}
+ */
 function createSongDiv(song){
     const div = document.createElement("div");
     div.setAttribute("data-songfile", song.file);
@@ -65,6 +69,7 @@ async function renderSongs() {
     });
 }
 
+/** Downloads all song for offline use */
 async function downloadAllSongs(){
     const result = await songList.search(undefined, undefined, false);
     let songlist = [];

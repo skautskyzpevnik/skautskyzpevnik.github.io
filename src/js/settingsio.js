@@ -15,6 +15,9 @@ let id = 0;
 
 renderSettings();
 
+/**
+ * Render Settings ui
+ */
 async function renderSettings(){
     document.getElementById("reset").addEventListener("click", function(){reset_settings(); location.reload()});
     let translation = await fetchWrapper(prefix + "settings/translation.json");
@@ -22,6 +25,12 @@ async function renderSettings(){
     create_editfields(settings,document.getElementById("settings"), translation)
 }
 
+/**
+ * Recursively creates ui field for settings editing
+ * @param {Object} object 
+ * @param {HTMLElement} parent 
+ * @param {Object} translation 
+ */
 function create_editfields(object, parent, translation){
     for(let key in object){
         let id_copy = id;
@@ -133,6 +142,12 @@ function create_editfields(object, parent, translation){
     }
 }
 
+/**
+ * Edits settings
+ * @param {Object} object 
+ * @param {string} key 
+ * @param {string} id 
+ */
 function edit(object, key, id){
     if(document.getElementById(id).getAttribute("type") == "checkbox"){
         object[key] = Boolean(document.getElementById(id).checked);

@@ -1,9 +1,15 @@
+/**
+ * Class representing lexical error in parser
+ */
 export class LexicalError extends Error {
     constructor(message, lineNumber, charNumber) {
         super("Lexical error: " + message + "\n on line " + lineNumber + "char: " + charNumber)
     }
 }
 
+/**
+ * Class representing lexical token
+ */
 export class Token{
     line = 0;
     charNumber = 0;
@@ -14,54 +20,86 @@ export class Token{
     innerText = "";
     static name = "token";
 }
-
+/**
+ * Class representing OpeningCurlyBrace token
+ */
 export class OpeningCurlyBrace extends Token { 
     innerText = "{";
     static name = "{";
 };
+/**
+ * Class representing ClosingCurlyBrace token
+ */
 export class ClosingCurlyBrace extends Token {
     innerText = "}";
     static name = "}";
 };
+/**
+ * Class representing Colon token
+ */
 export class Colon extends Token {
     innerText = ":";
     static name = ":";
 };
+/**
+ * Class representing OpeningSquareBracket token
+ */
 export class OpeningSquareBracket extends Token {
     innerText = "[";
     static name = "[";
 };
+/**
+ * Class representing ClosingSquareBracket token
+ */
 export class ClosingSquareBracket extends Token {
     innerText = "]";
     static name = "]";
 };
+/**
+ * Class representing Newline token
+ */
 export class Newline extends Token {
     innerText = "\n";
     static name = "newline";
 };
+/**
+ * Class representing Asterisk token
+ */
 export class Asterisk extends Token {
     innerText = "*";
     static name = "*";
 };
+/**
+ * Class representing Dash token
+ */
 export class Dash extends Token {
     innerText = "-";
     static name = "-";
 };
-
+/**
+ * Class representing QuotationMarks token
+ */
 export class QuotationMarks extends Token {
     innerText = "\"";
     static name = "\"";
 };
-
+/**
+ * Class representing Equals token
+ */
 export class Equals extends Token {
     innerText = "=";
     static name = "=";
 };
-
+/**
+ * Class representing Space token
+ */
 export class Space extends Token {
     innerText = " ";
     static name = "space";
 };
+/**
+ * Class representing Word token
+ */
 export class Word extends Token {
     static name = "word";
     constructor(innerText = "", lineNumber, charNumber) {

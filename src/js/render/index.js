@@ -16,6 +16,10 @@ if(songBook === "all"){
 	lonelySong(songName);
 }
 
+/**
+ * Renders just one song
+ * @param {string} songName 
+ */
 async function lonelySong(songName) {
 	let startTime = Date.now();
 	let ast = await getSongByName(songName);
@@ -23,6 +27,11 @@ async function lonelySong(songName) {
 	renderFromSongbook(ast);
 }
 
+/**
+ * Renders just one song from url
+ * @param {string} filename
+ * @param {string} url
+ */
 export async function lonelySongFromUrl(url, filename) {
 	let startTime = Date.now();
 	let ast = await getSongByUrl(filename, new Songbook(), url);
@@ -30,6 +39,13 @@ export async function lonelySongFromUrl(url, filename) {
 	renderFromSongbook(ast);
 }
 
+/**
+ * Finds song by title and artist
+ * @param {Object} list list of songs
+ * @param {string} title 
+ * @param {string} artist 
+ * @returns 
+ */
 function findSong(list, title, artist){
 	let result = undefined;
 	for(let song in list.songs){
@@ -42,6 +58,10 @@ function findSong(list, title, artist){
 	return result;
 }
 
+/**
+ * Renders whole songbook
+ * @param {string} songbookName 
+ */
 async function renderSongbook(songbookName) {
 	const songs = [];
 	let list = await fetchWrapper("data/list.json");
@@ -70,6 +90,9 @@ async function renderSongbook(songbookName) {
 	renderFromSongbook(ast);
 }
 
+/**
+ * Renders everything
+ */
 async function renderAll() {
 	let list = await fetchWrapper("data/list.json");
 	list = await list.json();
@@ -78,9 +101,9 @@ async function renderAll() {
 }
 
 /**
- * 
+ * Loads all songs from array
  * @param {Array} songArray 
- * @returns 
+ * @returns {Songbook}
  */
 async function loadSongsFromArray(songArray, title = "", subtitle = "", filename = undefined) {
 	let startTime = Date.now();
@@ -104,20 +127,20 @@ async function loadSongsFromArray(songArray, title = "", subtitle = "", filename
 }
 
 /**
- * 
+ * Gets song by name
  * @param {string} songName 
  * @param {Songbook} songBook 
- * @returns 
+ * @returns {Songbook}
  */
 async function getSongByName(songName, songBook = new Songbook()) {
 	return await getSongByUrl(songName, songBook, "data/" + songName + ".chordpro");
 }
 
 /**
- * 
+ * Gets song by url
  * @param {string} songName 
  * @param {Songbook} songBook 
- * @returns 
+ * @returns {Songbook}
  */
 async function getSongByUrl(songName, songBook = new Songbook(), url){
 	let chordPro = undefined;
@@ -135,7 +158,7 @@ async function getSongByUrl(songName, songBook = new Songbook(), url){
 }
 
 /**
- * 
+ * Renders songs from songbook
  * @param {Songbook} songBook 
  */
 async function renderFromSongbook(songBook) {

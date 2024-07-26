@@ -11,6 +11,7 @@ class Songlist{
     #localSongbooks = [];
     constructor(){
     }
+    /**Fills the structure with data*/
     async #prepare(){
         if (this.#songList.length == 0) {
             let list = localStorage.getItem("list");
@@ -35,6 +36,10 @@ class Songlist{
         await this.#localSongbooksLoad();
     }
 
+    /**
+     * Returns list of all songbooks
+     * @returns {Array} list of all songbooks
+     */
     async songBooks(){
         await this.#prepare();
         let songbooks = this.#songBooks;
@@ -44,11 +49,16 @@ class Songlist{
         return songbooks;
     }
 
+    /**
+     * Returns list of local songbooks
+     * @returns {Array} list of local songbooks
+     */
     async localSongbooks(){
         this.#prepare();
         return this.#localSongbooks;
     }
 
+    /** Loads local songbooks */
     #localSongbooksLoad(){
         if(window.localStorage){
             let localSongbooks = JSON.parse(window.localStorage.getItem("songbooks"));
@@ -56,18 +66,31 @@ class Songlist{
                 for(let songbook of localSongbooks){
                     songbook = JSON.parse(window.localStorage.getItem(songbook));
                     if(songbook){
-                        this.localSongbooks.push(songbook);
+                        this.#localSongbooks.push(songbook);
                     }
                 }
             }
         }
     }
 
+    /**
+     * Updates local songbook
+     * @param {string} title 
+     * @param {string} subtitle 
+     * @param {Object} songs 
+     */
     #updateSongbookNoChecks(title, subtitle, songs){
         let songbook = {"title":title, "subtitle":subtitle, "songs": songs};
         window.localStorage.setItem("songbook-"+title+subtitle, JSON.stringify(songbook));
     }
 
+    /**
+     * Updates local songbook
+     * @param {string} title 
+     * @param {string} subtitle 
+     * @param {Object} songs 
+     * @returns {boolean}
+     */
     updateSongbook(title, subtitle, songs){
         if(window.localStorage){
             let localSongbooks = JSON.parse(window.localStorage.getItem("songbook-"+title+subtitle));
@@ -75,10 +98,18 @@ class Songlist{
                 return false;
             }else{
                 this.#updateSongbookNoChecks(title, subtitle, songs);
+                return true;
             }
         }
     }
 
+    /**
+     * Adds new songbook
+     * @param {string} title 
+     * @param {string} subtitle 
+     * @param {Object} songs 
+     * @returns {boolean|undefined}
+     */
     addSongbook(title, subtitle, songs){
         if(window.localStorage){
             if(window.localStorage.getItem("songbook-"+title+subtitle)){
@@ -98,6 +129,12 @@ class Songlist{
         }
     }
 
+    /**
+     * Removes songbook
+     * @param {string} title 
+     * @param {string} subtitle 
+     * @returns {boolean|undefined}
+     */
     removeSongbook(title, subtitle){
         if(window.localStorage){
             let localSongbooks = JSON.parse(window.localStorage.getItem("songbooks"));
@@ -132,12 +169,24 @@ class Songlist{
         return results;
     }
 
+    /**
+     * Filters songs by title
+     * @param {Object} filteredSonglist 
+     * @param {string} string 
+     * @returns {Object}
+     */
     #titleSearch(filteredSonglist, string){
         return this.#filter(filteredSonglist, function(song) {
             return song.title.toLowerCase().includes(string.toLowerCase());
         });
     }
 
+    /**
+     * Filters songs by artists
+     * @param {Object} filteredSonglist 
+     * @param {string} string 
+     * @returns {Object}
+     */
     #artistSearch(filteredSonglist, string){
         return this.#filter(filteredSonglist, function(song) {
             return song.artist.toLowerCase().includes(string.toLowerCase());
@@ -170,7 +219,7 @@ class Songlist{
      * Filters by offline avalibility of songs 
      * @param {Array} filteredSonglist 
      * @param {boolean} offline return only offline
-     * @returns {Promise} Array matching songs
+     * @returns {Object} Array matching songs
      */
     async #offline(filteredSonglist, offline){
         let cache = await caches.open("songCache");
@@ -192,6 +241,11 @@ class Songlist{
         }
         return offlineSongs;
     }
+
+    /**
+     * Syncs offline saved songs with songlist
+     * Helpful when updating
+     */
     async #syncOffline() {
         let cache = await caches.open("songCache");
         let offlineSongsRequests = await cache.keys();

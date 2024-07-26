@@ -4,6 +4,11 @@ for(let i =  "a".charCodeAt(0); i< "z".charCodeAt(0)+1; i++){
     alphabet.push(String.fromCharCode(i));
 }
 
+/**
+ * Generates unique id
+ * @param {number} length 
+ * @returns {string}
+ */
 export function generateUID(length){
     let id = ""
     for (let i = 0; i < length; i++) {

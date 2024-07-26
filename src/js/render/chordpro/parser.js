@@ -11,9 +11,10 @@ export class SyntaxError extends Error {
 }
 
 /**
- * 
+ * Test if token is of the expected type
  * @param {Token} token 
- * @param {*} expected 
+ * @param {Class} expected 
+ * @throws {SyntaxError}
  */
 function expect(token, expected) {
     if (! (token instanceof expected)) {
@@ -21,6 +22,12 @@ function expect(token, expected) {
     }
 }
 
+/**
+ * Returns values for next token
+ * @param {number} i 
+ * @param {number} tokens 
+ * @returns 
+ */
 function next(i, tokens) {
     return {
         "i": ++i,
@@ -28,11 +35,25 @@ function next(i, tokens) {
     }
 }
 
+/**
+ * Returns values for next token and expect type of current one
+ * @param {number} i 
+ * @param {Token[]} tokens 
+ * @param {Class} expected
+ * @throws {SyntaxError}
+ * @returns 
+ */
 function expectAndNext(i, tokens, expected) {
     expect(tokens[i], expected);
     return next(i, tokens);
 }
 
+/**
+ * Returns values for next token that is not space
+ * @param {number} i 
+ * @param {Token[]} tokens 
+ * @returns 
+ */
 function ignoreWhitespace(i, tokens) {
     let numberSpace = 0;
     while (i < tokens.length && tokens[i] instanceof Space ) {
@@ -46,6 +67,13 @@ function ignoreWhitespace(i, tokens) {
     };    
 }
 
+/**
+ * Returns arguments and next token
+ * @param {number} i 
+ * @param {Token[]} tokens
+ * @throws {SyntaxError}
+ * @returns 
+ */
 function exportArgument(i, tokens) {
     let token;
     let textArray = [];
@@ -96,9 +124,10 @@ function exportArgument(i, tokens) {
 }
 
 /**
- * 
+ * Returns closest node to close in tree (up)
  * @param {str} directiveName 
- * @param {SyntaxTreeNode} active 
+ * @param {SyntaxTreeNode} active
+ * @throws {InternalError}
  */
 function getClosing(directiveName, active, warn) {
     let activeNode = active;
@@ -115,7 +144,7 @@ function getClosing(directiveName, active, warn) {
 }
 
 /**
- * 
+ * Returns closest node of class in tree (up)
  * @param {Class} classInstance 
  * @param {SyntaxTreeNode} active 
  */

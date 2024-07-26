@@ -7,7 +7,7 @@ class Prop {
 } 
 
 /**
- * 
+ * Add callback on property change
  * @param {Object} obj 
  * @param {String} propName 
  * @param {Function} callback 
@@ -38,6 +38,14 @@ export function watch(obj, propName, callback) {
     });
 }
 
+/**
+ * Creates link property -> property
+ * WARNING DO NOT DO THIS BOTH WAYS (results in infinite loop)
+ * @param {*} obj1 
+ * @param {*} propName1 
+ * @param {*} obj2 
+ * @param {*} propName2 
+ */
 export function linkProperties(obj1, propName1, obj2, propName2) {
     obj2[propName2] = obj1[propName1];
     watch(obj1, propName1, (newValue, oldValue) => {
@@ -46,7 +54,7 @@ export function linkProperties(obj1, propName1, obj2, propName2) {
 }
 
 /**
- * 
+ * Creates link property -> html attribute
  * @param {Object} obj1 
  * @param {String} propName1 
  * @param {HTMLElement} htmlNode 
