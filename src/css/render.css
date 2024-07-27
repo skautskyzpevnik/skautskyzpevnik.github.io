@@ -119,9 +119,9 @@
     #toolbar label{
         display: inline-block;
     }
-    #content .chord{
+    /* #content .chord{
         min-width: 30px;
-    }
+    } */
 }
 
 @media screen and (max-width: 21cm) {

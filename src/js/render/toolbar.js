@@ -155,8 +155,12 @@ window.addEventListener('keydown', function (e) {
             }
             break;
         case "KeyC":
-            chord(e);
-            e.preventDefault();
+            if (pressedKeys.alt) {
+                chord(e);
+                e.preventDefault();
+                pressedKeys.ctrl = false;
+                pressedKeys.alt = false;
+            }
             break;
     }
 });
@@ -171,6 +175,10 @@ window.addEventListener('keyup', function (e) {
         case "ControlLeft":
             e.preventDefault();
             pressedKeys.ctrl = false;
+            break;
+        case "AltLeft":
+        case "AltRight":
+            pressedKeys.alt = false;
             break;
     }
 });
