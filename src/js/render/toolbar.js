@@ -2,8 +2,9 @@ import { glob } from "./chordpro/globals.js";
 import { getAstNodeFromElement, getElementFromNode, getParentWithId, RingBuffer } from "./chordpro/utils.js";
 import { currentSongBook } from "./index.js";
 import { lonelySongFromUrl } from "./index.js";
-import { Text } from "./chordpro/ast.js";
+import { Text } from "./chordpro/nodes/text.js";
 
+/** @type {HTMLDivElement} */
 const toolbar = document.getElementById("toolbar");
 
 /**
@@ -84,6 +85,14 @@ function chord(event) {
     }
 }
 
+function hideToolbar() {
+    if (toolbar.style.display == "none") {
+        toolbar.style.display = "flex";
+    } else {
+        toolbar.style.display = "none";
+    }
+}
+
 const editButton = document.getElementById("edit");
 editButton.addEventListener("click", edit);
 show(editButton, glob.contentEditable);
@@ -111,7 +120,6 @@ window.addEventListener('keydown', function (e) {
     if (e.defaultPrevented) {
         return;
     }
-
     switch (e.code) {
         case "ControlRight":
         case "ControlLeft":
@@ -126,40 +134,49 @@ window.addEventListener('keydown', function (e) {
             if (pressedKeys.ctrl) {
                 save(e)
                 e.preventDefault();
-                pressedKeys.ctrl = false;
-                pressedKeys.alt = false;
             }
             break;
         case "KeyP":
             if (pressedKeys.ctrl) {
                 this.print();
                 e.preventDefault();
-                pressedKeys.ctrl = false;
-                pressedKeys.alt = false;
             }
             break;
         case "KeyO":
             if (pressedKeys.ctrl) {
                 this.document.getElementById("fileInput").click();
                 e.preventDefault();
-                pressedKeys.ctrl = false;
-                pressedKeys.alt = false;
             }
             break;
         case "KeyE":
             if (pressedKeys.ctrl) {
                 edit(e)
                 e.preventDefault();
-                pressedKeys.ctrl = false;
-                pressedKeys.alt = false;
             }
             break;
         case "KeyC":
             if (pressedKeys.alt) {
                 chord(e);
                 e.preventDefault();
-                pressedKeys.ctrl = false;
-                pressedKeys.alt = false;
+            }
+            break;
+        case "KeyZ":
+            if (pressedKeys.ctrl) {
+                glob.journal.undo();
+                e.preventDefault();
+            }
+            break;
+        case "KeyY":
+            if (pressedKeys.ctrl) {
+                // todo redo
+                glob.journal.redo();
+                e.preventDefault();
+            }
+            break;
+        case "KeyX":
+            if (pressedKeys.ctrl) {
+                hideToolbar();
+                e.preventDefault();
             }
             break;
     }
@@ -191,12 +208,12 @@ function download(filename, text) {
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
-  
+
     element.style.display = 'none';
     document.body.appendChild(element);
-  
+
     element.click();
-  
+
     document.body.removeChild(element);
 }
 /**@type {Range} */

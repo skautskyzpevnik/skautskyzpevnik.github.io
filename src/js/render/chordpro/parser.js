@@ -1,8 +1,16 @@
 import {tokenizer, Token, OpeningCurlyBrace, ClosingCurlyBrace, Colon, OpeningSquareBracket, ClosingSquareBracket, Asterisk, Space, Word, Dash, Newline, QuotationMarks, Equals} from "./lexer.js"
 import { InternalError } from "./helper.js"
 import { Soc, Sov, directiveSearch } from "./directives.js"
-import { Songbook, Song, MetaDirective, DirectiveChildren, Chord, SyntaxTreeNode, Directive, Text, Line } from "./ast.js"
+import { Songbook } from "./nodes/songbook.js"
+import { Song } from "./nodes/song.js"
+import { Chord } from "./nodes/chord.js"
+import { Text } from "./nodes/text.js"
+import { Line } from "./nodes/line.js"
 import { getAbove } from "./utils.js"
+import { MetaDirective } from "./abstractNodes/metaDirective.js"
+import { DirectiveChildren } from "./abstractNodes/directiveWithChildren.js"
+import { SyntaxTreeNode } from "./abstractNodes/node.js"
+import { Directive } from "./abstractNodes/directive.js"
 
 export class SyntaxError extends Error {
     constructor(message, lineNumber, charNumber) {

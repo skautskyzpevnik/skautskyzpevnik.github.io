@@ -1,6 +1,10 @@
 import { fetchWrapper } from "../utils.js";
 import { parse } from "./chordpro/parser.js"
-import { Songbook, SyntaxTreeLeafNode } from "./chordpro/ast.js"
+import { Songbook } from "./chordpro/nodes/songbook.js";
+
+/**
+ * @typedef {import('./chordpro/abstractNodes/leafNode.js').SyntaxTreeLeafNode} SyntaxTreeLeafNode
+ */
 
 /**@type {SyntaxTreeLeafNode|undefined} */
 export let currentSongBook = undefined;
@@ -8,11 +12,11 @@ const url = new URL(window.location.href);
 const songName = url.searchParams.get('songname');
 const songBook = url.searchParams.get('songbook');
 
-if(songBook === "all"){
+if (songBook === "all") {
 	renderAll();
-}else if(songBook !== null){
+} else if (songBook !== null) {
 	renderSongbook(songBook)
-}else if(songName !== null){
+} else if (songName !== null) {
 	lonelySong(songName);
 }
 
@@ -22,7 +26,7 @@ if(songBook === "all"){
  */
 async function lonelySong(songName) {
 	let startTime = Date.now();
-	let ast = await getSongByName(songName);
+	let ast = await getSongByUrl(sanitizeName(songName), new Songbook(), getUrlFromSongName(songName));
 	console.log("Parsed song in " + (Date.now() - startTime) + " ms.");
 	renderFromSongbook(ast);
 }
@@ -34,7 +38,7 @@ async function lonelySong(songName) {
  */
 export async function lonelySongFromUrl(url, filename) {
 	let startTime = Date.now();
-	let ast = await getSongByUrl(filename, new Songbook(), url);
+	let ast = await getSongByUrl(sanitizeName(filename), new Songbook(), url);
 	console.log("Parsed song in " + (Date.now() - startTime) + " ms.");
 	renderFromSongbook(ast);
 }
@@ -46,11 +50,11 @@ export async function lonelySongFromUrl(url, filename) {
  * @param {string} artist 
  * @returns 
  */
-function findSong(list, title, artist){
+function findSong(list, title, artist) {
 	let result = undefined;
-	for(let song in list.songs){
+	for (let song in list.songs) {
 		song = list.songs[song];
-		if(song.title == title & song.artist == artist){
+		if (song.title == title & song.artist == artist) {
 			result = song;
 			break;
 		}
@@ -65,21 +69,21 @@ function findSong(list, title, artist){
 async function renderSongbook(songbookName) {
 	const songs = [];
 	let list = await fetchWrapper("data/list.json");
-    list = await list.json();
+	list = await list.json();
 	let songbook = undefined;
-	for( let testSongBook of list.songbooks){
-		if(songbookName == testSongBook.file){
+	for (let testSongBook of list.songbooks) {
+		if (songbookName == testSongBook.file) {
 			songbook = await fetchWrapper("data/" + testSongBook.file);
 			songbook = await songbook.json();
 			break;
 		}
 	}
-	if(songbook === undefined){
+	if (songbook === undefined) {
 		alert("Zpěvník neexistuje");
-	}else{
-		for( let song of songbook.songs){
-			song = findSong(list, song.title, song.artist);
-			if(song.file === undefined){
+	} else {
+		for (const songObj of songbook.songs) {
+			const song = findSong(list, songObj.title, songObj.artist);
+			if (song.file === undefined) {
 				alert("Píseň \"" + song.title + "\" neexistuje");
 			} else {
 				songs.push(song);
@@ -106,34 +110,55 @@ async function renderAll() {
  * @returns {Songbook}
  */
 async function loadSongsFromArray(songArray, title = "", subtitle = "", filename = undefined) {
+
 	let startTime = Date.now();
+	const chorArraydPro = await Promise.all(songArray.map(async (song) => {
+		return await getChordpro(getUrlFromSongName(song.file));
+	}));
+	console.log("Downloaded " + songArray.length + " songs in " + (Date.now() - startTime) + " ms.");
+
+	startTime = Date.now();
 	const songBook = new Songbook();
 	songBook.filename = filename;
 	songBook.title = title;
 	songBook.subtitle = subtitle;
-	for (let song of songArray) {
-		try {
-			// console.log("Started parsing: " + song.title);
-			await getSongByName(song.file, songBook);
-			// console.log("Finished parsing: " + song.title);
-		} catch (e) {
-			console.error(song.title);
-			console.error(e);
-		}
-		
+	for (let song of chorArraydPro) {
+		parse(song, songBook);
 	}
 	console.log("Parsed " + songArray.length + " songs in " + (Date.now() - startTime) + " ms.");
 	return songBook;
 }
 
 /**
- * Gets song by name
+ * Returns song url from songname 
  * @param {string} songName 
- * @param {Songbook} songBook 
- * @returns {Songbook}
+ * @returns {string}
  */
-async function getSongByName(songName, songBook = new Songbook()) {
-	return await getSongByUrl(songName, songBook, "data/" + songName + ".chordpro");
+function getUrlFromSongName(songName) {
+	return "data/" + songName + ".chordpro";
+}
+
+/**
+ * Gets chordpro text by url
+ * @param {string} url
+ * @returns {string} chordpro string
+ */
+async function getChordpro(url) {
+	let chordPro = undefined;
+	try {
+		chordPro = await fetchWrapper(url);
+		chordPro = await chordPro.text();
+	} catch (e) {
+		alert("Song was not found.")
+		console.log(e);
+		return;
+	}
+	return chordPro
+}
+
+function sanitizeName(songName) {
+	let name = songName.split("/");
+	return name[name.length - 1]
 }
 
 /**
@@ -142,19 +167,8 @@ async function getSongByName(songName, songBook = new Songbook()) {
  * @param {Songbook} songBook 
  * @returns {Songbook}
  */
-async function getSongByUrl(songName, songBook = new Songbook(), url){
-	let chordPro = undefined;
-	try{
-		chordPro = await fetchWrapper(url);
-		chordPro = await chordPro.text();
-	}catch(e){
-		alert("Song was not found.")
-		console.log(e);
-		return;
-	}
-	let name = songName.split("/");
-	name = name[name.length - 1]
-	return parse(chordPro, songBook, name);
+async function getSongByUrl(songName, songBook = new Songbook(), url) {
+	return parse(await getChordpro(url), songBook, songName);
 }
 
 /**

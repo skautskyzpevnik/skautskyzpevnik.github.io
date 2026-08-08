@@ -1,4 +1,4 @@
-import { SyntaxTreeNode } from "./ast.js";
+import { SyntaxTreeNode } from "./abstractNodes/node.js";
 import { currentSongBook } from "../index.js";
 
 /**
