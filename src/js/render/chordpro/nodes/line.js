@@ -58,13 +58,19 @@ export class Line extends SyntaxTreeNodeWithChildren {
         if (this.children[this.children.length - 1] instanceof Chord) {
             this.appendChild(new Text(this.line, this.charNumber, ""));
         }
+        let wasPrevChord = false;
         for (let child of this.children) {
             if (child instanceof Chord) {
-                if (active !== this.htmlElement) {
-                    this.htmlElement.appendChild(active);
+                if (!wasPrevChord) {
+                    if (active !== this.htmlElement) {
+                        this.htmlElement.appendChild(active);
+                    }
+                    active = document.createElement("div");
+                    active.setAttribute("class", "chordLyricsWrapper");
+                    wasPrevChord = true;
                 }
-                active = document.createElement("div");
-                active.setAttribute("class", "chordLyricsWrapper");
+            } else {
+                wasPrevChord = false;
             }
             active.appendChild(child.html);
         }

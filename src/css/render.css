@@ -36,8 +36,16 @@
 #content .chord {
     color: #44f;
     font-weight: bold;
-    display: block;
+    display: inline-block;
     width: fit-content;
+}
+
+#content .chord+.chord {
+    margin-left: 0.5rem;
+}
+
+#content .lyrics {
+    display: block;
 }
 
 #content .chordLyricsWrapper {
