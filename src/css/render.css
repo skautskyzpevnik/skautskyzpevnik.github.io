@@ -44,7 +44,7 @@
     margin-left: 0.5rem;
 }
 
-#content .lyrics {
+#content .chordLyricsWrapper .lyrics {
     display: block;
 }
 
