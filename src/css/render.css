@@ -58,6 +58,11 @@
     color: rgb(91, 91, 91);
 }
 
+#content .comment {
+    font-style: oblique;
+    color: rgb(91, 91, 91);
+}
+
 #content p {
     margin-top: 0rem;
 }
