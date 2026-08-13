@@ -1,6 +1,6 @@
-import {tokenizer, Token, OpeningCurlyBrace, ClosingCurlyBrace, Colon, OpeningSquareBracket, ClosingSquareBracket, Asterisk, Space, Word, Dash, Newline, QuotationMarks, Equals} from "./lexer.js"
+import { tokenizer, Token, OpeningCurlyBrace, ClosingCurlyBrace, Colon, OpeningSquareBracket, ClosingSquareBracket, Asterisk, Space, Word, Dash, Newline, QuotationMarks, Equals } from "./lexer.js"
 import { InternalError } from "./helper.js"
-import { Soc, Sov, directiveSearch } from "./directives.js"
+import { Soc, Sov, directiveSearch } from "./directives/index.js"
 import { Songbook } from "./nodes/songbook.js"
 import { Song } from "./nodes/song.js"
 import { Chord } from "./nodes/chord.js"
@@ -25,7 +25,7 @@ export class SyntaxError extends Error {
  * @throws {SyntaxError}
  */
 function expect(token, expected) {
-    if (! (token instanceof expected)) {
+    if (!(token instanceof expected)) {
         throw new SyntaxError("Unexpected '" + token.constructor.name + "' expecting: " + expected.name, token.line, token.charNumber);
     }
 }
@@ -64,7 +64,7 @@ function expectAndNext(i, tokens, expected) {
  */
 function ignoreWhitespace(i, tokens) {
     let numberSpace = 0;
-    while (i < tokens.length && tokens[i] instanceof Space ) {
+    while (i < tokens.length && tokens[i] instanceof Space) {
         i++;
         numberSpace++;
     }
@@ -72,7 +72,7 @@ function ignoreWhitespace(i, tokens) {
         "i": i,
         "token": tokens[i],
         "numberSpace": numberSpace
-    };    
+    };
 }
 
 /**
@@ -96,16 +96,16 @@ function exportArgument(i, tokens) {
             i++;
         }
         if (value !== "") {
-            textArray.push(value);    
+            textArray.push(value);
         }
         if (tokens[i] instanceof Space) {
-            textArray.push(" "); 
+            textArray.push(" ");
         }
     } while (i < tokens.length && tokens[i] instanceof Space);
-    
-    if (tokens[i] instanceof Equals && i > 1 && tokens[i-1] instanceof Word) {
+
+    if (tokens[i] instanceof Equals && i > 1 && tokens[i - 1] instanceof Word) {
         i++;
-        let value = ""; 
+        let value = "";
         if (tokens[i] instanceof QuotationMarks) {
             i++;
             while (i < tokens.length && (tokens[i] instanceof Word || tokens[i] instanceof Space || tokens[i] instanceof Asterisk || tokens[i] instanceof Dash)) {
@@ -244,9 +244,9 @@ export function parse(text, songBook = new Songbook(), filename = undefined) {
                     ({ i, token, unnamedArgument, namedArguments } = exportArgument(i, tokens));
                 }
                 expect(token, ClosingCurlyBrace);
-                
+
                 // parse Directive
-                
+
                 let directive = directiveSearch(directiveName);
                 if (directive === undefined) {
                     let newActiveNode = getClosing(directiveName, activeNode, true);
@@ -319,7 +319,7 @@ export function parse(text, songBook = new Songbook(), filename = undefined) {
                 }
                 readNewline = false;
                 // text
-                
+
                 for (; i < tokens.length && !(tokens[i] instanceof Newline || tokens[i] instanceof OpeningSquareBracket || tokens[i] instanceof OpeningCurlyBrace); i++) {
                     value += tokens[i].innerText;
                 }
@@ -327,7 +327,7 @@ export function parse(text, songBook = new Songbook(), filename = undefined) {
                     activeNode.appendChild(new Text(line, charNumber, value));
                 }
                 if (tokens[i] instanceof Newline || tokens[i] instanceof OpeningSquareBracket || tokens[i] instanceof OpeningCurlyBrace) {
-                    i--;   
+                    i--;
                 }
             }
         }
