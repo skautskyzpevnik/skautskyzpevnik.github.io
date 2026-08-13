@@ -4,6 +4,7 @@ import { Songbook } from "./chordpro/nodes/songbook.js";
 
 /**
  * @typedef {import('./chordpro/abstractNodes/leafNode.js').SyntaxTreeLeafNode} SyntaxTreeLeafNode
+ * @import { Song } from "./chordpro/nodes/song.js";
  */
 
 /**@type {SyntaxTreeLeafNode|undefined} */
@@ -28,6 +29,9 @@ async function lonelySong(songName) {
 	let startTime = Date.now();
 	let ast = await getSongByUrl(sanitizeName(songName), new Songbook(), getUrlFromSongName(songName));
 	console.log("Parsed song in " + (Date.now() - startTime) + " ms.");
+	/**@type {Song} */
+	let song = ast.children[0];
+	document.title = `${song.title} - ${song.artist}`;
 	renderFromSongbook(ast);
 }
 
@@ -81,6 +85,7 @@ async function renderSongbook(songbookName) {
 	if (songbook === undefined) {
 		alert("Zpěvník neexistuje");
 	} else {
+		document.title = `${songbook.title} - ${songbook.subtitle}`;
 		for (const songObj of songbook.songs) {
 			const song = findSong(list, songObj.title, songObj.artist);
 			if (song.file === undefined) {
