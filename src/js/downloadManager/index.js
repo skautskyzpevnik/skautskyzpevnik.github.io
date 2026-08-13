@@ -1,42 +1,42 @@
 import { generateUID } from "./utils.js"
 
-class DownloadManagerWorkerMsgData{
+class DownloadManagerWorkerMsgData {
     type;
     toDownload;
     cacheName;
     callback;
 }
 
-class DownloadManager{
+class DownloadManager {
     #cacheDownloader;
     #port;
-    #callbackArray = [];
-    #errorCallbackArray = [];
-    #progressCallbackArray = [];
-    #callbackObjects = [];
+    callbackArray = [];
+    errorCallbackArray = [];
+    progressCallbackArray = [];
+    callbackObjects = [];
     isWorkerShared = false;
 
-    constructor(notSharedEror = false){
-        if (window.Worker) {    
+    constructor(notSharedEror = false) {
+        if (window.Worker) {
             // if(window.SharedWorker){
             //     this.#cacheDownloader = new SharedWorker("js/downloadManager/worker.js");
             //     this.#port = this.#cacheDownloader.port;
             //     this.isWorkerShared = true
             // }else
-            if(!notSharedEror){
+            if (!notSharedEror) {
                 console.warn("The downloadManager worker is not shared");
                 this.#cacheDownloader = new Worker("js/downloadManager/worker.js");
                 this.#port = this.#cacheDownloader;
-            }else{
+            } else {
                 throw Error("The downloadManager worker is not shared");
             }
             this.#cacheDownloader.onmessage = this.#workerCallback;
-            this.#cacheDownloader.callbackArray = this.#callbackArray;
-            this.#cacheDownloader.errorCallbackArray = this.#errorCallbackArray;
-            this.#cacheDownloader.progressCallbackArray = this.#progressCallbackArray;
-            this.#cacheDownloader.callbackObjects = this.#callbackObjects;
+            this.#cacheDownloader.callbackArray = this.callbackArray;
+            this.#cacheDownloader.errorCallbackArray = this.errorCallbackArray;
+            this.#cacheDownloader.progressCallbackArray = this.progressCallbackArray;
+            this.#cacheDownloader.callbackObjects = this.callbackObjects;
             console.log("downloadManager worker register");
-        }else{
+        } else {
             console.error("Web Workers api unavalible.");
         }
     }
@@ -45,17 +45,17 @@ class DownloadManager{
      * Handles messages from worker
      * @param {MessageEvent} e 
      */
-    #workerCallback(e){
+    #workerCallback(e) {
         console.log(e);
-        if(e.data.state == "done"){
-            this.#progressCallbackArray[e.data.callback](this.#callbackObjects[e.data.callback], e.data);
-        }else if(e.data.state == "failed"){
-            this.#errorCallbackArray[e.data.callback](this.#callbackObjects[e.data.callback], e.data);
-        }else{
+        if (e.data.state == "done") {
+            this.progressCallbackArray[e.data.callback](this.callbackObjects[e.data.callback], e.data);
+        } else if (e.data.state == "failed") {
+            this.errorCallbackArray[e.data.callback](this.callbackObjects[e.data.callback], e.data);
+        } else {
             console.error("Unimplemented");
         }
     }
-    
+
     /**
      * Adds resource to cache
      * @param {string|string[]} toDownload Urls
@@ -66,24 +66,24 @@ class DownloadManager{
      * @param {Function} errorCallback 
      * @returns {Boolean}
      */
-    downloadToCache(toDownload, cacheName, data, callback = console.log, progressCallback = console.log, errorCallback = console.error){
-        if(typeof toDownload == "string"){
+    downloadToCache(toDownload, cacheName, data, callback = console.log, progressCallback = console.log, errorCallback = console.error) {
+        if (typeof toDownload == "string") {
             toDownload = [toDownload];
         }
         let msg = new DownloadManagerWorkerMsgData();
         msg.type = "cache";
         msg.toDownload = toDownload;
         msg.cacheName = cacheName;
-        
+
         // generate id
         let id = "";
-        while(id === "" | this.#callbackArray[id] !== undefined){
+        while (id === "" | this.callbackArray[id] !== undefined) {
             id = generateUID(10);
         }
-        this.#callbackArray[id] = callback;
-        this.#progressCallbackArray[id] = progressCallback;
-        this.#errorCallbackArray[id] = errorCallback;
-        this.#callbackObjects[id] = data;
+        this.callbackArray[id] = callback;
+        this.progressCallbackArray[id] = progressCallback;
+        this.errorCallbackArray[id] = errorCallback;
+        this.callbackObjects[id] = data;
 
         msg.callback = id;
 
@@ -96,12 +96,11 @@ export const downloadManagerInstance = new DownloadManager();
 
 if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().then((persistent) => {
-      if (persistent) {
-        console.log("Storage will not be cleared except by explicit user action");
-      }else{
-        alert("Prohlížeč může smazat některé písničky uložené offline.");
-        console.log("Storage may be cleared by the UA under storage pressure.");
-      }
+        if (persistent) {
+            console.log("Storage will not be cleared except by explicit user action");
+        } else {
+            alert("Prohlížeč může smazat některé písničky uložené offline.");
+            console.log("Storage may be cleared by the UA under storage pressure.");
+        }
     });
-  }
-  
+}
