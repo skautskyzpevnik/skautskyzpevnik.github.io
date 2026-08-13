@@ -1,9 +1,10 @@
 import { SyntaxTreeText } from "../abstractNodes/textNode.js";
+import { sanitizeTex } from "../helper.js";
 
 /**
  * Class implementing Chord ast node
  */
-export class Chord extends SyntaxTreeText{
+export class Chord extends SyntaxTreeText {
     /**
      * Sets focus to htmlElement representing this node
      */
@@ -23,7 +24,7 @@ export class Chord extends SyntaxTreeText{
             }
         }
     }
-    
+
     get html() {
         this.htmlElement = document.createElement("span");
         this.htmlElement.setAttribute("class", "chord");
@@ -34,5 +35,10 @@ export class Chord extends SyntaxTreeText{
 
     get chordpro() {
         return "[" + this.innerText + "]";
+    }
+
+    get tex() {
+        let text = sanitizeTex(this.innerText);
+        return `\\chord{${text}}`
     }
 }

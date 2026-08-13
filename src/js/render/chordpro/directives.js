@@ -4,6 +4,8 @@ import { DirectiveChildren } from "./abstractNodes/directiveWithChildren.js"
 import { SyntaxTreeNode } from "./abstractNodes/node.js"
 import { Song } from "./nodes/song.js"
 import { getAbove } from "./utils.js"
+import { Songbook } from "./nodes/songbook.js"
+import { sanitizeTex } from "./helper.js"
 
 /**
  * Class representing semantics error in parser
@@ -139,6 +141,14 @@ export class Soc extends DirectiveChildren {
         text += "\n{" + this.constructor.directiveClosingName + "}";
         return text;
     }
+
+    get tex() {
+        let text = `\n\\soc[${sanitizeTex(this.name)}] `;
+        for (let child of this.children) {
+            text += child.tex;
+        }
+        return text;
+    }
 }
 
 /**
@@ -201,6 +211,14 @@ export class Sov extends DirectiveChildren {
         }
         return text;
     }
+
+    get tex() {
+        let text = `\n\\sov[${sanitizeTex(String(this.name))}] `;
+        for (let child of this.children) {
+            text += child.tex;
+        }
+        return text;
+    }
 }
 
 /**
@@ -221,36 +239,45 @@ export class Chorus extends Directive {
     constructor(line, charNumber, unnamedArgument, namedArguments) {
         super(line, charNumber, unnamedArgument, namedArguments);
         this.name = unnamedArgument;
+
     }
+
+    /**
+     * Helper function that sets parent node
+     * SHOULD be called only by its parent 
+     * @param {SyntaxTreeNode|undefined} node 
+     */
+    setParent(node) {
+        super.setParent(node);
+        /** @type {Songbook} */
+        let song = getAbove(Song, this);
+        if (this.name === "" && song.lastChorus !== undefined) {
+            this.#linked = song.lastChorus;
+        } else if (song.chorusIndex[this.name] !== undefined) {
+            this.#linked = song.chorusIndex[this.name];
+        } else {
+            throw new SemanticsError("Chorus link before chorus", this.lineNumber, this.charNumber);
+        }
+    }
+
     get html() {
         const element = document.createElement("div");
         element.setAttribute("class", "choruslink");
-        /**@type Song */
-        let song = getAbove(Song, this);
-        if (song !== undefined) {
-            if (this.name !== "") {
-                this.#linked = song.chorusIndex[this.name];
-            } else {
-                this.#linked = song.lastChorus;
-            }
-            if (this.#linked === undefined) {
-                throw new SemanticsError("Song: \"" + song.title + "\" Unknown chorus", this.line, this.charNumber);
-            } else {
-                element.innerText = this.#linked.name;
-            }
-        } else {
-            console.warn("Broken tree!")
-        }
+        element.innerText = this.#linked.name;
         return element;
     }
+
     get chordpro() {
-        let text = "";
-        if (this.#linked !== undefined && this.#linked.name !== undefined) {
-            text = "\n\n{" + this.constructor.directiveName + ": " + this.#linked.name + "}";
+        if (this.#linked.generated) {
+            return `\n\n{${this.constructor.directiveName}: ${this.#linked.name}}`;
         } else {
-            text = "\n\n{" + this.constructor.directiveName + "}";
+            return `\n\n{${this.constructor.directiveName}}`;
         }
-        return text;
+
+    }
+
+    get tex() {
+        return `\n\\chorus[${sanitizeTex(this.#linked.name)}]\n`
     }
 }
 
@@ -288,6 +315,10 @@ export class Capo extends Directive {
         }
         return text;
     }
+
+    get tex() {
+        return `\\${this.constructor.directiveName}[${sanitizeTex(String(this.#capoSettings))}]`
+    }
 }
 
 /**
@@ -323,6 +354,10 @@ export class Comment extends Directive {
             text = "\n\n{" + this.constructor.directiveName + ": " + this.#text + "}";
         }
         return text;
+    }
+
+    get tex() {
+        return `\\${this.constructor.directiveName}[${sanitizeTex(String(this.#text))}]`
     }
 }
 

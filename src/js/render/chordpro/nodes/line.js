@@ -1,4 +1,5 @@
 import { SyntaxTreeNodeWithChildren } from "../abstractNodes/nodeWithChildren.js";
+import { sanitizeTex } from "../helper.js";
 import { Chord } from "./chord.js";
 import { Text } from "./text.js";
 
@@ -85,10 +86,18 @@ export class Line extends SyntaxTreeNodeWithChildren {
     }
 
     get chordpro() {
-        let text = this.innerText;
+        let text = this.innerText == "\n" ? "" : this.innerText;
         for (let child of this.children) {
             text += child.chordpro;
         }
-        return text;
+        return text + "\n";
+    }
+
+    get tex() {
+        let text = this.innerText == "\n" ? "" : sanitizeTex(this.innerText);
+        for (let child of this.children) {
+            text += child.tex;
+        }
+        return text + "\n";
     }
 }

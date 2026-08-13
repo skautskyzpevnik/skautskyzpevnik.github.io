@@ -1,12 +1,13 @@
 import { SyntaxTreeNodeWithChildren } from "../abstractNodes/nodeWithChildren.js";
 import { SyntaxTreeText } from "../abstractNodes/textNode.js";
 import { glob } from "../globals.js";
+import { sanitizeTex } from "../helper.js";
 import { Chord } from "./chord.js";
 
 /**
  * Class implementing text ast node
  */
-export class Text extends SyntaxTreeText{
+export class Text extends SyntaxTreeText {
 
     /**
      * Reacts to leave of html element corresponding to this node
@@ -30,7 +31,7 @@ export class Text extends SyntaxTreeText{
             const textPreChord = new Text(this.line, this.charNumber, this.innerText.slice(0, this.lastRange.start));
             const chord = new Chord(this.line, this.charNumber + this.innerText.length, chordText);
             const textPostChord = new Text(this.line, this.charNumber + this.innerText.length, secondText);
-            if(this.parent instanceof SyntaxTreeNodeWithChildren){
+            if (this.parent instanceof SyntaxTreeNodeWithChildren) {
                 this.parent.actionStart();
                 this.parent.insertAfter(textPreChord, this)
                 this.parent.insertAfter(chord, textPreChord);
@@ -69,5 +70,9 @@ export class Text extends SyntaxTreeText{
 
     get chordpro() {
         return this.innerText;
+    }
+
+    get tex() {
+        return sanitizeTex(this.innerText);
     }
 }

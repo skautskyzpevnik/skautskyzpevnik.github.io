@@ -33,4 +33,12 @@ export class Songbook extends SyntaxTreeNodeWithChildren {
         }
         return text;
     }
+
+    get tex() {
+        let text = "";
+        for (let child of this.children) {
+            text += child.tex;
+        }
+        return text;
+    }
 }
