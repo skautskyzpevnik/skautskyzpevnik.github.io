@@ -94,7 +94,7 @@ export class Line extends SyntaxTreeNodeWithChildren {
     }
 
     get tex() {
-        let text = this.innerText == "\n" ? "" : sanitizeTex(this.innerText);
+        let text = sanitizeTex(this.innerText);
         for (let child of this.children) {
             text += child.tex;
         }

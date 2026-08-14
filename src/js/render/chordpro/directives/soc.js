@@ -2,6 +2,7 @@ import { DirectiveChildren } from "../abstractNodes/directiveWithChildren.js"
 import { Song } from "../nodes/song.js"
 import { createVerseName } from "./helper.js"
 import { getAbove } from "../utils.js"
+import { sanitizeTex } from "../helper.js";
 
 
 /**@import {SyntaxTreeNode} from "../abstractNodes/node.js" */
@@ -77,7 +78,7 @@ export class Soc extends DirectiveChildren {
     }
 
     get tex() {
-        let text = `\n\\soc[${sanitizeTex(this.name)}] `;
+        let text = `\n\\soc{${sanitizeTex(this.name)}} `;
         for (let child of this.children) {
             text += child.tex;
         }

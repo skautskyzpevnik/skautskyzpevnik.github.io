@@ -93,6 +93,25 @@ function hideToolbar() {
     }
 }
 
+async function saveLatex() {
+    /** @type {FileSystemDirectoryHandle} */
+    let rootDir = await window.showDirectoryPicker({
+        "mode": "readwrite"
+    });
+    const ent = await rootDir.entries().next()
+    if (!ent.done) {
+        try {
+            rootDir = await rootDir.getDirectoryHandle(document.title, {
+                create: true,
+            });
+        } catch (e) {
+            alert(`Složka ${document.title} nezle vytvořit, použijte jinou složku.`)
+            return;
+        }
+    }
+    console.log("uhoh");
+}
+
 const editButton = document.getElementById("edit");
 editButton.addEventListener("click", edit);
 show(editButton, glob.contentEditable);
@@ -176,6 +195,12 @@ window.addEventListener('keydown', function (e) {
         case "KeyX":
             if (pressedKeys.ctrl) {
                 hideToolbar();
+                e.preventDefault();
+            }
+            break;
+        case "KeyL":
+            if (pressedKeys.ctrl) {
+                saveLatex();
                 e.preventDefault();
             }
             break;

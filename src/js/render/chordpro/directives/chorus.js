@@ -2,6 +2,7 @@ import { Directive } from "../abstractNodes/directive.js";
 import { Song } from "../nodes/song.js"
 import { SemanticsError } from "./helper.js";
 import { getAbove } from "../utils.js"
+import { sanitizeTex } from "../helper.js";
 
 /**
  * @import {SyntaxTreeNode} from "../abstractNodes/node.js"
@@ -64,6 +65,6 @@ export class Chorus extends Directive {
     }
 
     get tex() {
-        return `\n\\chorus[${sanitizeTex(this.#linked.name)}]\n`
+        return `\n\\chorus{${sanitizeTex(this.#linked.name)}}\n`
     }
 }

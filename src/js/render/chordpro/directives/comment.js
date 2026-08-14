@@ -1,5 +1,6 @@
 import { Directive } from "../abstractNodes/directive.js";
 import { SemanticsError } from "./helper.js";
+import { sanitizeTex } from "../helper.js";
 
 /**
  * Class implementing comment link node
@@ -37,6 +38,6 @@ export class Comment extends Directive {
     }
 
     get tex() {
-        return `\\${this.constructor.directiveName}[${sanitizeTex(String(this.#text))}]`
+        return `\\${this.constructor.directiveName}{${sanitizeTex(String(this.#text))}}`
     }
 }

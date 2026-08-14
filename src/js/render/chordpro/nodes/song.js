@@ -1,4 +1,5 @@
 import { SyntaxTreeNodeWithChildren } from "../abstractNodes/nodeWithChildren.js";
+import { sanitizeTex } from "../helper.js";
 
 /**
  * Class implementing song ast node
@@ -45,19 +46,11 @@ export class Song extends SyntaxTreeNodeWithChildren {
 
     get tex() {
         let text = "\n";
-        if (this.title !== "" && this.artist !== "") {
-            text += `\\section{${this.title} - ${this.artist}}\n`
-        } else if (this.title !== "") {
-            text += `\\section{${this.title}}\n`
-        } else if (this.artist !== "") {
-            text += `\\section{${this.artist}}\n`
-        }
-
-        text += "\\begin{enumerate}\n"
+        text += `\\songStart{${sanitizeTex(this.title)}}{${sanitizeTex(this.artist)}}\n`
 
         for (let child of this.children) {
             text += child.tex;
         }
-        return text + "\n\\end{enumerate}\n";
+        return text + "\n\\songEnd\n";
     }
 }

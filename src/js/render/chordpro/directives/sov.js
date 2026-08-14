@@ -1,5 +1,6 @@
 import { DirectiveChildren } from "../abstractNodes/directiveWithChildren.js"
 import { createVerseName } from "./helper.js"
+import { sanitizeTex } from "../helper.js";
 
 
 /**@import {SyntaxTreeNode} from "../abstractNodes/node.js" */
@@ -67,7 +68,7 @@ export class Sov extends DirectiveChildren {
     }
 
     get tex() {
-        let text = `\n\\sov[${sanitizeTex(String(this.name))}] `;
+        let text = this.generated ? "\n\\sov " : `\n\\sov{${sanitizeTex(String(this.name))}} `;
         for (let child of this.children) {
             text += child.tex;
         }

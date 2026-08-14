@@ -1,5 +1,6 @@
 import { MetaDirective } from "../abstractNodes/metaDirective.js"
 import { Song } from "../nodes/song.js"
+import { sanitizeTex } from "../helper.js";
 
 /**@import {SyntaxTreeNode} from "../abstractNodes/node.js" */
 

@@ -1,4 +1,5 @@
 import { Directive } from "../abstractNodes/directive.js";
+import { sanitizeTex } from "../helper.js";
 
 /**
  * Class implementing capo link node
@@ -36,6 +37,6 @@ export class Capo extends Directive {
     }
 
     get tex() {
-        return `\\${this.constructor.directiveName}[${sanitizeTex(String(this.#capoSettings))}]`
+        return `\\${this.constructor.directiveName}{${sanitizeTex(String(this.#capoSettings))}}`
     }
 }

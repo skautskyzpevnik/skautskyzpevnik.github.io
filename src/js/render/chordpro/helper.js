@@ -1,3 +1,46 @@
+const toReplace = [
+    {
+        "from": /\\/g,
+        "to": "\\\\"
+    },
+    {
+        "from": /#/g,
+        "to": "\\#"
+    },
+    {
+        "from": /\$/g,
+        "to": "\\$"
+    },
+    {
+        "from": /\{/g,
+        "to": "\\{"
+    },
+    {
+        "from": /\}/g,
+        "to": "\\}"
+    },
+    {
+        "from": /~/g,
+        "to": "\\string~"
+    },
+    {
+        "from": /&/g,
+        "to": "\\&"
+    },
+    {
+        "from": /_/g,
+        "to": "\\_"
+    },
+    {
+        "from": /%/g,
+        "to": "\\%"
+    },
+    {
+        "from": /\^/g,
+        "to": "\\^"
+    },
+];
+
 /**
  * Class representing internal error of parser
  */
@@ -15,5 +58,10 @@ export function sanitizeTex(str) {
     if (typeof str !== "string") {
         console.log("uh oh")
     }
-    return str.replace(/\\/g, "\\\\").replace(/#/g, "\\#").replace(/&/g, "\\&").replace(/_/g, "\\_");
+
+    for (const todo of toReplace) {
+        str = str.replace(todo["from"], todo["to"]);
+    }
+
+    return str;
 }
