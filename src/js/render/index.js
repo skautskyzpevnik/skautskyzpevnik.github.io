@@ -3,11 +3,10 @@ import { parse } from "./chordpro/parser.js"
 import { Songbook } from "./chordpro/nodes/songbook.js";
 
 /**
- * @typedef {import('./chordpro/abstractNodes/leafNode.js').SyntaxTreeLeafNode} SyntaxTreeLeafNode
  * @import { Song } from "./chordpro/nodes/song.js";
  */
 
-/**@type {SyntaxTreeLeafNode|undefined} */
+/**@type {Songbook|undefined} */
 export let currentSongBook = undefined;
 const url = new URL(window.location.href);
 const songName = url.searchParams.get('songname');

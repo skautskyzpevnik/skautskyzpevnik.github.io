@@ -1,0 +1,21 @@
+\newcommand\chord[2][l]{%
+    \makebox[0pt][#1]{\begin{tabular}[b]{@{}l@{}}#2\\\mbox{}\end{tabular}}}
+
+\newcommand\soc[1]{\item[#1:]}
+\NewDocumentCommand{\sov}{g}{
+    \IfNoValueTF{#1}
+    {\item}
+    {\item[#1:]}
+}
+\newcommand\chorus[1]{\item[#1]}
+
+\newcommand\songStart[2]{
+    \section{#1 - #2}
+    \begin{enumerate}[label=\arabic*:]
+        }
+        \newcommand\songEnd[0]{
+    \end{enumerate}
+}
+
+\newcommand\capo[1]{\item[]}
+\newcommand\comment[1]{\item[]}

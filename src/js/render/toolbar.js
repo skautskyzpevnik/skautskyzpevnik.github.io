@@ -3,6 +3,7 @@ import { getAstNodeFromElement, getElementFromNode, getParentWithId, RingBuffer 
 import { currentSongBook } from "./index.js";
 import { lonelySongFromUrl } from "./index.js";
 import { Text } from "./chordpro/nodes/text.js";
+import { Songbook } from "./chordpro/nodes/songbook.js";
 
 /** @type {HTMLDivElement} */
 const toolbar = document.getElementById("toolbar");
@@ -94,22 +95,24 @@ function hideToolbar() {
 }
 
 async function saveLatex() {
-    /** @type {FileSystemDirectoryHandle} */
-    let rootDir = await window.showDirectoryPicker({
-        "mode": "readwrite"
-    });
-    const ent = await rootDir.entries().next()
-    if (!ent.done) {
-        try {
-            rootDir = await rootDir.getDirectoryHandle(document.title, {
-                create: true,
-            });
-        } catch (e) {
-            alert(`Složka ${document.title} nezle vytvořit, použijte jinou složku.`)
-            return;
+    if (currentSongBook !== undefined) {
+        /** @type {FileSystemDirectoryHandle} */
+        let rootDir = await window.showDirectoryPicker({
+            "mode": "readwrite"
+        });
+        const ent = await rootDir.entries().next()
+        if (!ent.done) {
+            try {
+                rootDir = await rootDir.getDirectoryHandle(document.title, {
+                    create: true,
+                });
+            } catch (e) {
+                alert(`Složka ${document.title} nezle vytvořit, použijte jinou složku.`)
+                return;
+            }
         }
+        currentSongBook.toTexFolder(rootDir);
     }
-    console.log("uhoh");
 }
 
 const editButton = document.getElementById("edit");
